@@ -25,15 +25,20 @@
 
 <audio id="my0">
     <!--    <source src="horse.ogg" type="audio/ogg">-->
-    <source src="https://s3-us-west-2.amazonaws.com/sound-clips-032721237383/0/clip.6e565c40-d738-4fd4-a63e-e187204dc46c.mp3" type="audio/mpeg">
+    <source src="https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/0-1" type="audio/mpeg">
 </audio>
 <audio id="my1">
     <!--    <source src="horse.ogg" type="audio/ogg">-->
-    <source src="https://s3-us-west-2.amazonaws.com/sound-clips-032721237383/1/clip.69b94bc4-1bcb-4318-a0e3-3ea52d6c3208.mp3" type="audio/mpeg">
+    <source src="https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/1-1" type="audio/mpeg">
+</audio>
+<audio id="my2">
+    <!--    <source src="horse.ogg" type="audio/ogg">-->
+    <source src="https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/2-1" type="audio/mpeg">
 </audio>
 
 <button onclick="play0()" type="button">Play 0</button>
 <button onclick="play1()" type="button">Play 1</button>
+<button onclick="play2()" type="button">Play 2</button>
 
 <script>
   function play0() {
@@ -41,6 +46,9 @@
   }
   function play1() {
     document.getElementById("my1").play();
+  }
+  function play2() {
+    document.getElementById("my2").play();
   }
 </script>
 
