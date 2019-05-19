@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         .block {
-            display: block;
-            width: 100%;
+            width: 30%;
             border-width: medium;
             font-size: x-large;
             margin-bottom: inherit;
@@ -15,34 +14,43 @@
             padding: 1em;
         }
     </style>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+      $(window).on('load', function() {
+        main();
+      });
+
+      function constructDigitHTML(digit) {
+          var button = $("<button />")
+            .addClass("block")
+            .text("Play " + digit)
+            .click(function() {
+              play(digit);
+            });
+
+          var source = $("<source />")
+            .attr("src", "https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/digit/" + digit)
+            .attr("type", "audio/mpeg");
+          var audio = $("<audio />")
+            .attr("id", "audio-digit-" + digit)
+            .append(source);
+          $("body").append(button, audio);
+      }
+
+      function main() {
+        for (var digit = 0; digit < 10; digit++) {
+          constructDigitHTML(digit);
+        }
+      }
+
+      function play(digit) {
+        $("#audio-digit-" + digit)[0].play();
+      }
+    </script>
 </head>
 <body>
 
-<audio id="audio-digit-0">
-    <source src="https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/0-1" type="audio/mpeg">
-</audio>
-<audio id="audio-digit-1">
-    <source src="https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/1-1" type="audio/mpeg">
-</audio>
-<audio id="audio-digit-2">
-    <source src="https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/2-1" type="audio/mpeg">
-</audio>
-<audio id="audio-digit-3">
-    <source src="https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/3-1" type="audio/mpeg">
-</audio>
-
 <h1 lang="ja" align="center">聴忍者</h1>
-
-<button onclick="play(0)" type="button" class="block">Play 0</button>
-<button onclick="play(1)" type="button" class="block">Play 1</button>
-<button onclick="play(2)" type="button" class="block">Play 2</button>
-<button onclick="play(3)" type="button" class="block">Play 3</button>
-
-<script>
-  function play(digit) {
-    document.getElementById("audio-digit-" + digit).play();
-  }
-</script>
 
 </body>
 </html>
