@@ -136,12 +136,12 @@
       function appendToHistory(number) {
         var text = $("<span />")
           .text(number2text(number));
-        var link = $("<a />")
+        var link = $("<span />").append($("<a />")
           .attr("href", "javascript:void(0);")
           .text("[Hear again]")
           .mousedown(function() {
             play(number);
-          });
+          }));
         var record = $("<li />")
           .append(text, " ", link);
         $(".history").show();
