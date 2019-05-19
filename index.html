@@ -90,24 +90,19 @@
           .attr("id", "audio-day-of-the-month-" + number)
           .attr("preload", "none")
           .append(source);
+        $(".audios").append(audio);
 
         return audio;
       });
 
       function main() {
-        numbers.forEach(function (number) {
-          var audio = number2audio(number);
-          $(".audios").append(audio);
-        });
-        (function setup() {
-          $(".buttons > button")
-            .mousedown(function() {
-              var number = getNextNumber();
-              play(number);
-              displayAnswer(number);
-              appendToHistory(number);
-            });
-        })();
+        $(".buttons > button")
+          .mousedown(function() {
+            var number = getNextNumber();
+            play(number);
+            displayAnswer(number);
+            appendToHistory(number);
+          });
       }
 
       var getNextNumber = (function() {
@@ -153,7 +148,7 @@
         }
 
         $(".history").show();
-        var historyRecord = getHistoryRecord(number)
+        var historyRecord = getHistoryRecord(number);
         $(".history > ul").prepend(historyRecord);
       }
 
