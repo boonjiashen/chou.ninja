@@ -157,19 +157,102 @@
         }
       }
 
+      class TrackListWithLookAhead {
+        constructor(exprGenerator, expr2audio) {
+          this._exprGenerator = exprGenerator;
+          this._expr2audio = expr2audio;
+          this._nextExpression = this._exprGenerator.next();
+          this._currentAudio = null;
+          this._nextAudio = this._expr2audio(this._nextExpression);
+        }
+
+        nextExpression() {
+          const toBeReturned = this._nextExpression;
+          this._nextExpression = this._exprGenerator.next();
+          this._currentAudio = this._nextAudio;
+          this._nextAudio = this._expr2audio(this._nextExpression);
+
+          return toBeReturned;
+        }
+
+        getCurrentAudio() {
+          return this._currentAudio;
+        }
+      }
+
+      class ExpressionGenerator {
+        next() {
+          throw "MethodNotImplementedException";
+        }
+      }
+
+      class SimpleExpressionGenerator extends ExpressionGenerator {
+        constructor(expressions) {
+          super();
+          if (expressions.length == 0) {
+            throw "IllegalArgumentException";
+          }
+          this._expressions = expressions;
+          this._remainders = expressions.slice(0);
+        }
+
+        next() {
+          if (this._remainders.length == 0) {
+            this._remainders = this._expressions.slice(0);
+            this._remainders = shuffle(this._remainders);
+          }
+          const x = this._remainders.pop();
+          return x;
+        }
+      }
+
       $(window).on('load', function() {
         main();
       });
 
-      var counteredExpressions = [];
-      for (var x = 1; x <= 31; x++) {
-        counteredExpressions.push(new DayOfMonthExpression(x));
-      }
-      for (var x = 0; x <= 10; x++) {
-        counteredExpressions.push(new CounterlessExpression(x));
-      }
-      for (let x = 1; x <= 7; x++) {
-        counteredExpressions.push(new DayOfWeekExpression(x));
+      function getSelectedExpressions() {
+        function getDaysOfMonth() {
+          let selection =  $(".dayOfMonth option:selected").val();
+          if ("none" == selection) {
+            return [];
+          }
+          let items = [];
+          for (let x = 1; x <= 31; x++) {
+            items.push(new DayOfMonthExpression(x));
+          }
+          return items;
+        }
+
+        function getDaysOfWeek() {
+          let selection =  $(".dayOfWeek option:selected").val();
+          if ("none" == selection) {
+            return [];
+          }
+          let items = [];
+          for (let x = 1; x <= 7; x++) {
+            items.push(new DayOfWeekExpression(x));
+          }
+          return items;
+        }
+
+        function getPlainNumbers() {
+          let selection =  $(".plainNumber option:selected").val();
+          if ("none" == selection) {
+            return [];
+          }
+          let items = [];
+          for (let x = 0; x <= 10; x++) {
+            items.push(new CounterlessExpression(x));
+          }
+          return items;
+        }
+
+        const expressions = [].concat(getDaysOfMonth(), getDaysOfWeek(), getPlainNumbers());
+        if (expressions.length == 0) {
+          throw "IncorrectUserInputException";
+        }
+
+        return expressions;
       }
 
       function expr2apiPath(expr) {
@@ -197,39 +280,31 @@
           .attr("id", "audio-" + expr.toString())
           .attr("preload", "auto")
           .append(source);
-        $(".audios").append(audio);
 
         return audio;
       });
 
+      let tracklist = null;
+      function initializeTracklist() {
+        let counteredExpressions = shuffle(getSelectedExpressions());
+        let expressionGenerator = new SimpleExpressionGenerator(counteredExpressions);
+        tracklist = new TrackListWithLookAhead(expressionGenerator, expr2audio);
+      }
+
       function main() {
+        initializeTracklist();
         $(".buttons > button")
           .mousedown(function() {
-            var expr = getNextExprWithLookAhead();
-            play(expr);
+            const expr = tracklist.nextExpression();
+            const $audio = tracklist.getCurrentAudio();
+            play($audio);
             displayAnswer(expr);
             appendToHistory(expr);
           });
+        $(".dayOfWeek, .dayOfMonth, .plainNumber").change(function() {
+          initializeTracklist();
+        });
       }
-
-      var getNextExpression = (function() {
-        var remainders = [];
-        return function() {
-          if (remainders.length == 0) {
-            remainders = counteredExpressions.slice(0);
-            remainders = shuffle(remainders);
-          }
-          var x = remainders.pop();
-          return x;
-        };
-      })();
-
-      var getNextExprWithLookAhead = preload(function() {
-        var expr = getNextExpression();
-        expr2audio(expr);
-
-        return expr;
-      });
 
       function displayAnswer(expr) {
         $(".answer").show();
@@ -238,8 +313,8 @@
           .text(expr.toString());
       }
 
-      function appendToHistory(expr) {
-        function getHistoryRecord(expr) {
+      function appendToHistory(expr, $audio) {
+        function getHistoryRecord(expr, $audio) {
           var transcript = $("<span />")
             .text(expr.toString())
             .attr("lang", "ja");
@@ -248,7 +323,7 @@
             .text("[Hear again]")
             .attr("lang", "en")
             .mousedown(function() {
-              play(expr);
+              play($audio);
             });
           var suffix = $("<span />")
             .append(anchor);
@@ -258,7 +333,7 @@
         }
 
         $(".history").show();
-        var historyRecord = getHistoryRecord(expr);
+        const historyRecord = getHistoryRecord(expr, $audio);
         $(".history > ul").prepend(historyRecord);
       }
 
@@ -274,15 +349,15 @@
         };
       })();
 
-      var play = (function() {
-        var dummyAudio = $("<audio />")[0];
-        var prevAudio = dummyAudio;
+      let play = (function() {
+        let dummyAudio = $("<audio />")[0];
+        let prevAudio = dummyAudio;
 
-        return function(expr) {
+        return function($audio) {
           prevAudio.pause();
           prevAudio.currentTime = 0;
 
-          var currAudio = expr2audio(expr)[0];
+          const currAudio = $audio[0];
           currAudio.playbackRate = getCurrentPlaybackRate();
           currAudio.play();
           prevAudio = currAudio;
@@ -293,8 +368,6 @@
 <body>
 
 <h1 lang="ja">聴忍者</h1>
-
-<div class="audios"></div>
 
 <div class="buttons">
     <button lang="en">
@@ -311,7 +384,27 @@
 <hr />
 <div class="setting" lang="en">
     <div>
-        Playback content: day of the month, days of the week, plain numbers
+        Playback content:
+        <ul>
+            <li>Days of the month:
+                <select class="dayOfMonth">
+                    <option value="none">None</option>
+                    <option value="all" selected>All</option>
+                </select>
+            </li>
+            <li>Days of the week
+                <select class="dayOfWeek">
+                    <option value="none">None</option>
+                    <option value="all" selected>All</option>
+                </select>
+            </li>
+            <li>Plain numbers
+                <select class="plainNumber">
+                    <option value="none">None</option>
+                    <option value="zeroToTen" selected>0 - 10</option>
+                </select>
+            </li>
+        </ul>
     </div>
     <div>
         Playback speed:
