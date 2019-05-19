@@ -15,7 +15,7 @@
             height: 5em;
             vertical-align: middle;
         }
-        #answer {
+        .answer {
             font-size: xx-large;
         }
         body {
@@ -94,6 +94,18 @@
         };
       })();
 
+      function displayAnswer(number) {
+        var prefix = $("<span />")
+          .attr("lang", "en")
+          .text("Currently playing: ");
+        var suffix = $("<span />")
+          .attr("lang", "ja")
+          .text(number2text(number));
+        $(".answer")
+          .empty()
+          .append(prefix, suffix);
+      }
+
       function constructRandomButton() {
         var button = $("<button />")
           .attr("lang", "en")
@@ -102,19 +114,13 @@
           .mousedown(function() {
             var number = getNextNumber();
             play(number);
-            $("#answer").text("Current playing: " + number2text(number));
+            displayAnswer(number);
           });
-          $("body").append(button);
+          $(".buttons").append(button);
       }
 
       function number2text(number) {
         return number + "日";
-      }
-
-      function getAnswerDiv() {
-        return $("<div />")
-          .attr("id", "answer")
-          .attr("lang", "ja");
       }
 
       function appendToHistory(number) {
@@ -127,7 +133,6 @@
           $("body").append(audio);
         })
         constructRandomButton();
-        $("body").append(getAnswerDiv());
       }
 
       var play = (function() {
@@ -148,6 +153,10 @@
 <body>
 
 <h1 lang="ja">聴忍者</h1>
+
+<div class="buttons"></div>
+<div class="answer"></div>
+<div class="history"></div>
 
 </body>
 </html>
