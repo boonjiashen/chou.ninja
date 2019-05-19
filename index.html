@@ -5,16 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        .block {
+        button {
             display: block;
             width: 100%;
             border-width: medium;
             font-size: x-large;
             margin-bottom: inherit;
-            background-color: gray;
+            background-color: rgb(80,80,80);
             font-weight: bold;
             height: 5em;
             vertical-align: middle;
+            color: white;
         }
         h1, .buttons, .answer, .mode {
             text-align: center;
@@ -30,7 +31,8 @@
             background: black;
         }
         a {
-            color: gray;
+            color: darkgray;
+        ;
         }
     </style>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -80,6 +82,18 @@
         numbers.push(digit);
       }
 
+      var number2audio = memoize(function(number) {
+        var source = $("<source />")
+          .attr("src", "https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/day-of-month/" + number)
+          .attr("type", "audio/mpeg");
+        var audio = $("<audio />")
+          .attr("id", "audio-day-of-the-month-" + number)
+          .attr("preload", "none")
+          .append(source);
+
+        return audio;
+      });
+
       function main() {
         numbers.forEach(function (number) {
           var audio = number2audio(number);
@@ -95,18 +109,6 @@
             });
         })();
       }
-
-      var number2audio = memoize(function(number) {
-        var source = $("<source />")
-          .attr("src", "https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/day-of-month/" + number)
-          .attr("type", "audio/mpeg");
-        var audio = $("<audio />")
-          .attr("id", "audio-day-of-the-month-" + number)
-          .attr("preload", "none")
-          .append(source);
-
-        return audio;
-      });
 
       var getNextNumber = (function() {
         var remainders = [];
@@ -168,7 +170,7 @@
 <div class="audios"></div>
 
 <div class="buttons">
-    <button lang="en" class="block">
+    <button lang="en">
         Play random number
     </button>
 </div>
