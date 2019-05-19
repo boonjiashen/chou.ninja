@@ -134,18 +134,27 @@
       }
 
       function appendToHistory(number) {
-        var text = $("<span />")
-          .text(number2text(number));
-        var link = $("<span />").append($("<a />")
-          .attr("href", "javascript:void(0);")
-          .text("[Hear again]")
-          .mousedown(function() {
-            play(number);
-          }));
-        var record = $("<li />")
-          .append(text, " ", link);
+        function getHistoryRecord(number) {
+          var transcript = $("<span />")
+            .text(number2text(number))
+            .attr("lang", "ja");
+          var anchor = $("<a />")
+            .attr("href", "javascript:void(0);")
+            .text("[Hear again]")
+            .attr("lang", "en")
+            .mousedown(function() {
+              play(number);
+            });
+          var suffix = $("<span />")
+            .append(anchor);
+
+          return $("<li />")
+            .append(transcript, " ", suffix);
+        }
+
         $(".history").show();
-        $(".history > ul").prepend(record);
+        var historyRecord = getHistoryRecord(number)
+        $(".history > ul").prepend(historyRecord);
       }
 
       var play = (function() {
@@ -182,19 +191,19 @@
 </div>
 
 <hr />
-<div class="mode">
+<div class="mode" lang="en">
     Mode: day of the month
 </div>
 <div class="history">
     <hr />
-    <div>
+    <div lang="en">
         History:
     </div>
     <ul></ul>
 </div>
 
 <hr />
-<div>
+<div lang="en">
     <a href="http://jiashen.me">
         Home
     </a>
