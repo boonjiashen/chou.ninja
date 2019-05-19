@@ -22,7 +22,7 @@
         .answer {
             font-size: xx-large;
         }
-        .history {
+        .history, .answer {
             display: none;
         }
         body {
@@ -35,10 +35,6 @@
     </style>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script>
-      $(window).on('load', function() {
-        main();
-      });
-
       // See https://stackoverflow.com/a/2450976/3606378
       function shuffle(array) {
         var currentIndex = array.length, temporaryValue, randomIndex;
@@ -65,7 +61,6 @@
         return function() {
           var key = JSON.stringify(arguments);
           if (cache[key]){
-            console.log(cache)
             return cache[key];
           }
           else{
@@ -76,9 +71,21 @@
         }
       }
 
+      $(window).on('load', function() {
+        main();
+      });
+
       var numbers = [];
       for (var digit = 1; digit <= 10; digit++) {
         numbers.push(digit);
+      }
+
+      function main() {
+        numbers.forEach(function (number) {
+          var audio = number2audio(number);
+          $("body").append(audio);
+        })
+        setupRandomButton();
       }
 
       var number2audio = memoize(function(number) {
@@ -106,29 +113,20 @@
       })();
 
       function displayAnswer(number) {
-        var prefix = $("<span />")
-          .attr("lang", "en")
-          .text("Currently playing: ");
-        var suffix = $("<span />")
-          .attr("lang", "ja")
-          .text(number2text(number));
-        $(".answer")
+        $(".answer").show();
+        $(".answer > .suffix")
           .empty()
-          .append(prefix, suffix);
+          .text(number2text(number));
       }
 
-      function constructRandomButton() {
-        var button = $("<button />")
-          .attr("lang", "en")
-          .addClass("block")
-          .text("Play random number")
+      function setupRandomButton() {
+        $(".buttons > button")
           .mousedown(function() {
             var number = getNextNumber();
             play(number);
             displayAnswer(number);
             appendToHistory(number);
           });
-          $(".buttons").append(button);
       }
 
       function number2text(number) {
@@ -150,14 +148,6 @@
         $(".history > ul").prepend(record);
       }
 
-      function main() {
-        numbers.forEach(function (number) {
-          var audio = number2audio(number);
-          $("body").append(audio);
-        })
-        constructRandomButton();
-      }
-
       var play = (function() {
         var dummyAudio = $("<audio />")[0];
         var prevAudio = dummyAudio;
@@ -177,8 +167,17 @@
 
 <h1 lang="ja">聴忍者</h1>
 
-<div class="buttons"></div>
-<div class="answer"></div>
+<div class="buttons">
+    <button lang="en" class="block">
+        Play random number
+    </button>
+</div>
+<div class="answer">
+    <span lang="en">
+        Currently playing:
+    </span>
+    <span lang="ja" class="suffix"></span>
+</div>
 
 <hr />
 <div class="mode">
