@@ -24,7 +24,7 @@
             border-width: medium;
         }
         .answer {
-            font-size: xx-large;
+            font-size: x-large;
         }
         .history, .answer {
             display: none;
@@ -299,7 +299,7 @@
             const $audio = tracklist.getCurrentAudio();
             play($audio);
             displayAnswer(expr);
-            appendToHistory(expr);
+            appendToHistory(expr, $audio);
           });
         $(".dayOfWeek, .dayOfMonth, .plainNumber").change(function() {
           initializeTracklist();
