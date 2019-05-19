@@ -6,20 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         .block {
-            width: 30%;
+            display: block;
+            width: 100%;
             border-width: medium;
             font-size: x-large;
             margin-bottom: inherit;
-            background-color: aliceblue;
+            background-color: gray;
             font-weight: bold;
             height: 5em;
             vertical-align: middle;
         }
+        h1, .buttons, .answer, .mode {
+            text-align: center;
+        }
         .answer {
             font-size: xx-large;
         }
+        .history {
+            display: none;
+        }
         body {
-            text-align: center;
+            color: white;
+            background: black;
+        }
+        a {
+            color: gray;
         }
     </style>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -75,7 +86,7 @@
           .attr("src", "https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/day-of-month/" + number)
           .attr("type", "audio/mpeg");
         var audio = $("<audio />")
-          .attr("id", "audio-digit-" + number)
+          .attr("id", "audio-day-of-the-month-" + number)
           .attr("preload", "none")
           .append(source);
 
@@ -115,6 +126,7 @@
             var number = getNextNumber();
             play(number);
             displayAnswer(number);
+            appendToHistory(number);
           });
           $(".buttons").append(button);
       }
@@ -124,7 +136,18 @@
       }
 
       function appendToHistory(number) {
-
+        var text = $("<span />")
+          .text(number2text(number));
+        var link = $("<a />")
+          .attr("href", "javascript:void(0);")
+          .text("[Hear again]")
+          .mousedown(function() {
+            play(number);
+          });
+        var record = $("<li />")
+          .append(text, " ", link);
+        $(".history").show();
+        $(".history > ul").prepend(record);
       }
 
       function main() {
@@ -156,7 +179,24 @@
 
 <div class="buttons"></div>
 <div class="answer"></div>
-<div class="history"></div>
 
+<hr />
+<div class="mode">
+    Mode: day of the month
+</div>
+<div class="history">
+    <hr />
+    <div>
+        History:
+    </div>
+    <ul></ul>
+</div>
+
+<hr />
+<div>
+    <a href="http://jiashen.me">
+        Home
+    </a>
+</div>
 </body>
 </html>
