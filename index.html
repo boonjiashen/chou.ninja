@@ -86,16 +86,46 @@
         }
       }
 
+      const CounterType = {
+        "DAY_OF_MONTH": 1
+      };
+
+      class CounteredExpression {
+        constructor(numbers) {
+          this.numbers = numbers;
+          this.counters = [];
+          this.str = null
+          this.counterType = null;
+        }
+      }
+
+      class DayOfMonthExpression extends CounteredExpression {
+        constructor(number) {
+          super([number]);
+          this.counters = ["日"];
+          this.counterType = CounterType.DAY_OF_MONTH;
+        }
+
+        toString() {
+          return this.numbers[0] + this.counters[0];
+        }
+      }
+
       $(window).on('load', function() {
         main();
       });
 
-      var numbers = [];
-      for (var digit = 1; digit <= 31; digit++) {
-        numbers.push(digit);
+      var counteredExpressions = [];
+      for (var x = 1; x <= 31; x++) {
+        counteredExpressions.push(new DayOfMonthExpression(x));
       }
 
-      var number2audio = memoize(function(number) {
+      var expr2audio = memoize(function(expr) {
+        if (expr.counterType != CounterType.DAY_OF_MONTH) {
+          throw "IllegalArgumentException";
+        }
+
+        let number = expr.numbers[0];
         var source = $("<source />")
           .attr("src", "https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/day-of-month/" + number)
           .attr("type", "audio/mpeg");
@@ -111,18 +141,18 @@
       function main() {
         $(".buttons > button")
           .mousedown(function() {
-            var number = getNextNumberWithLookAhead();
-            play(number);
-            displayAnswer(number);
-            appendToHistory(number);
+            var expr = getNextExprWithLookAhead();
+            play(expr);
+            displayAnswer(expr);
+            appendToHistory(expr);
           });
       }
 
-      var getNextNumber = (function() {
+      var getNextExpression = (function() {
         var remainders = [];
         return function() {
           if (remainders.length == 0) {
-            remainders = numbers.slice(0);
+            remainders = counteredExpressions.slice(0);
             remainders = shuffle(remainders);
           }
           var x = remainders.pop();
@@ -130,35 +160,31 @@
         };
       })();
 
-      var getNextNumberWithLookAhead = preload(function() {
-        var number = getNextNumber();
-        number2audio(number);
+      var getNextExprWithLookAhead = preload(function() {
+        var expr = getNextExpression();
+        expr2audio(expr);
 
-        return number;
+        return expr;
       });
 
-      function displayAnswer(number) {
+      function displayAnswer(expr) {
         $(".answer").show();
         $(".answer > .suffix")
           .empty()
-          .text(number2text(number));
+          .text(expr.toString());
       }
 
-      function number2text(number) {
-        return number + "日";
-      }
-
-      function appendToHistory(number) {
-        function getHistoryRecord(number) {
+      function appendToHistory(expr) {
+        function getHistoryRecord(expr) {
           var transcript = $("<span />")
-            .text(number2text(number))
+            .text(expr.toString())
             .attr("lang", "ja");
           var anchor = $("<a />")
             .attr("href", "javascript:void(0);")
             .text("[Hear again]")
             .attr("lang", "en")
             .mousedown(function() {
-              play(number);
+              play(expr);
             });
           var suffix = $("<span />")
             .append(anchor);
@@ -168,7 +194,7 @@
         }
 
         $(".history").show();
-        var historyRecord = getHistoryRecord(number);
+        var historyRecord = getHistoryRecord(expr);
         $(".history > ul").prepend(historyRecord);
       }
 
@@ -188,11 +214,11 @@
         var dummyAudio = $("<audio />")[0];
         var prevAudio = dummyAudio;
 
-        return function(number) {
+        return function(expr) {
           prevAudio.pause();
           prevAudio.currentTime = 0;
 
-          var currAudio = number2audio(number)[0];
+          var currAudio = expr2audio(expr)[0];
           currAudio.playbackRate = getCurrentPlaybackRate();
           currAudio.play();
           prevAudio = currAudio;
