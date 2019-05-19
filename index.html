@@ -76,6 +76,16 @@
         }
       }
 
+      // Expects a generator (function that takes no arguments), and calls it before the user calls
+      function preload(func) {
+        var nextReturn = func();
+        return function() {
+          var toBeReturned = nextReturn;
+          nextReturn = func();
+          return toBeReturned;
+        }
+      }
+
       $(window).on('load', function() {
         main();
       });
@@ -91,7 +101,7 @@
           .attr("type", "audio/mpeg");
         var audio = $("<audio />")
           .attr("id", "audio-day-of-the-month-" + number)
-          .attr("preload", "none")
+          .attr("preload", "auto")
           .append(source);
         $(".audios").append(audio);
 
@@ -101,7 +111,7 @@
       function main() {
         $(".buttons > button")
           .mousedown(function() {
-            var number = getNextNumber();
+            var number = getNextNumberWithLookAhead();
             play(number);
             displayAnswer(number);
             appendToHistory(number);
@@ -119,6 +129,13 @@
           return x;
         };
       })();
+
+      var getNextNumberWithLookAhead = preload(function() {
+        var number = getNextNumber();
+        number2audio(number);
+
+        return number;
+      });
 
       function displayAnswer(number) {
         $(".answer").show();
@@ -157,7 +174,7 @@
 
       var getCurrentPlaybackRate = (function() {
         var playbackRateNominal2Float = {
-          "slow": 0.5,
+          "slow": 0.8,
           "normal": 1,
           "fast": 1.5
         };
