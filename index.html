@@ -89,7 +89,8 @@
       // See: https://stackoverflow.com/a/2383215/3606378
       const CounterType = {
         "DAY_OF_MONTH": {"string": "day-of-month", "value": 1},
-        "PLAIN_NUMBER": {"string": "plain-number", "value": 2}
+        "DAY_OF_WEEK": {"string": "day-of-week", "value": 2},
+        "PLAIN_NUMBER": {"string": "plain-number", "value": 3}
       };
 
       class CounteredExpression {
@@ -103,6 +104,9 @@
 
       class DayOfMonthExpression extends CounteredExpression {
         constructor(number) {
+          if (number > 31 || number < 1) {
+            throw "IllegalArgumentException";
+          }
           super([number]);
           this.counters = ["日"];
           this.counterType = CounterType.DAY_OF_MONTH;
@@ -110,6 +114,34 @@
 
         toString() {
           return this.numbers[0] + this.counters[0];
+        }
+      }
+
+      class DayOfWeekExpression extends CounteredExpression {
+        constructor(number) {
+          if (number > 7 || number < 1) {
+            throw "IllegalArgumentException";
+          }
+          super([number]);
+          this.counters = ["曜日"];
+          this.counterType = CounterType.DAY_OF_WEEK;
+        }
+
+        static int2char(i) {
+          const map = {
+            1: "月",
+            2: "火",
+            3: "水",
+            4: "木",
+            5: "金",
+            6: "土",
+            7: "日"
+          }
+          return map[i];
+        }
+
+        toString() {
+          return DayOfWeekExpression.int2char(this.numbers[0]) + this.counters[0];
         }
       }
 
@@ -136,6 +168,9 @@
       for (var x = 0; x <= 10; x++) {
         counteredExpressions.push(new CounterlessExpression(x));
       }
+      for (let x = 1; x <= 7; x++) {
+        counteredExpressions.push(new DayOfWeekExpression(x));
+      }
 
       function expr2apiPath(expr) {
         let number = expr.numbers[0];
@@ -145,6 +180,10 @@
         }
         if (expr.counterType == CounterType.DAY_OF_MONTH) {
           apiPath = "https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/day-of-month/" + number;
+        }
+        if (expr.counterType == CounterType.DAY_OF_WEEK) {
+          let char = DayOfWeekExpression.int2char(number);
+          apiPath = "https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/day-of-week/" + char;
         }
         return apiPath;
       }
@@ -272,7 +311,7 @@
 <hr />
 <div class="setting" lang="en">
     <div>
-        Playback content: day of the month, plain numbers
+        Playback content: day of the month, days of the week, plain numbers
     </div>
     <div>
         Playback speed:
