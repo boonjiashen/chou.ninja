@@ -1,5 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .block {
+            display: block;
+            width: 100%;
+            border-width: medium;
+            font-size: x-large;
+            margin-bottom: inherit;
+            background-color: aliceblue;
+            font-weight: bold;
+        }
+    </style>
+</head>
 <body>
 
 <audio id="audio-digit-0">
@@ -15,10 +29,10 @@
     <source src="https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/3-1" type="audio/mpeg">
 </audio>
 
-<button onclick="play(0)" type="button">Play 0</button>
-<button onclick="play(1)" type="button">Play 1</button>
-<button onclick="play(2)" type="button">Play 2</button>
-<button onclick="play(3)" type="button">Play 3</button>
+<button onclick="play(0)" type="button" class="block">Play 0</button>
+<button onclick="play(1)" type="button" class="block">Play 1</button>
+<button onclick="play(2)" type="button" class="block">Play 2</button>
+<button onclick="play(3)" type="button" class="block">Play 3</button>
 
 <script>
   function play(digit) {
