@@ -83,9 +83,17 @@
       function main() {
         numbers.forEach(function (number) {
           var audio = number2audio(number);
-          $("body").append(audio);
-        })
-        setupRandomButton();
+          $(".audios").append(audio);
+        });
+        (function setup() {
+          $(".buttons > button")
+            .mousedown(function() {
+              var number = getNextNumber();
+              play(number);
+              displayAnswer(number);
+              appendToHistory(number);
+            });
+        })();
       }
 
       var number2audio = memoize(function(number) {
@@ -117,16 +125,6 @@
         $(".answer > .suffix")
           .empty()
           .text(number2text(number));
-      }
-
-      function setupRandomButton() {
-        $(".buttons > button")
-          .mousedown(function() {
-            var number = getNextNumber();
-            play(number);
-            displayAnswer(number);
-            appendToHistory(number);
-          });
       }
 
       function number2text(number) {
@@ -166,6 +164,8 @@
 <body>
 
 <h1 lang="ja">聴忍者</h1>
+
+<div class="audios"></div>
 
 <div class="buttons">
     <button lang="en" class="block">
