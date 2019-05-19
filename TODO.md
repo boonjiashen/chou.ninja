@@ -1,5 +1,6 @@
 ### TODO
 
-* Make playback rate part of history
+* Make playback rate part of history (should we?)
 * Make series never repeat a word
-* Figure out where the <audio /> for the first audio goes
+* Why does the browser load two audio files on page load
+* Fix font size discrepancies on mobile

@@ -157,26 +157,32 @@
         }
       }
 
+      class Track {
+        constructor(counteredExpression, $audio) {
+          this.counteredExpression = counteredExpression;
+          this.$audio = $audio;
+        }
+      }
+
       class TrackListWithLookAhead {
         constructor(exprGenerator, expr2audio) {
-          this._exprGenerator = exprGenerator;
-          this._expr2audio = expr2audio;
-          this._nextExpression = this._exprGenerator.next();
-          this._currentAudio = null;
-          this._nextAudio = this._expr2audio(this._nextExpression);
+          this._trackGenerator = preload(function() {
+            const expression = exprGenerator.next();
+            const $audio = expr2audio(expression);
+
+            return new Track(expression, $audio);
+          });
+          this._currentTrack = this._trackGenerator();
         }
 
         nextExpression() {
-          const toBeReturned = this._nextExpression;
-          this._nextExpression = this._exprGenerator.next();
-          this._currentAudio = this._nextAudio;
-          this._nextAudio = this._expr2audio(this._nextExpression);
+          this._currentTrack = this._trackGenerator();
 
-          return toBeReturned;
+          return this._currentTrack.counteredExpression;
         }
 
         getCurrentAudio() {
-          return this._currentAudio;
+          return this._currentTrack.$audio;
         }
       }
 
