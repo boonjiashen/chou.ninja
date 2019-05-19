@@ -86,8 +86,10 @@
         }
       }
 
+      // See: https://stackoverflow.com/a/2383215/3606378
       const CounterType = {
-        "DAY_OF_MONTH": 1
+        "DAY_OF_MONTH": {"string": "day-of-month", "value": 1},
+        "PLAIN_NUMBER": {"string": "plain-number", "value": 2}
       };
 
       class CounteredExpression {
@@ -111,6 +113,18 @@
         }
       }
 
+      class CounterlessExpression extends CounteredExpression {
+        constructor(number) {
+          super([number]);
+          this.counters = null;
+          this.counterType = CounterType.PLAIN_NUMBER;
+        }
+
+        toString() {
+          return this.numbers[0];
+        }
+      }
+
       $(window).on('load', function() {
         main();
       });
@@ -119,18 +133,29 @@
       for (var x = 1; x <= 31; x++) {
         counteredExpressions.push(new DayOfMonthExpression(x));
       }
+      for (var x = 0; x <= 10; x++) {
+        counteredExpressions.push(new CounterlessExpression(x));
+      }
+
+      function expr2apiPath(expr) {
+        let number = expr.numbers[0];
+        let apiPath = null;
+        if (expr.counterType == CounterType.PLAIN_NUMBER) {
+          apiPath = "https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/digit/" + number;
+        }
+        if (expr.counterType == CounterType.DAY_OF_MONTH) {
+          apiPath = "https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/day-of-month/" + number;
+        }
+        return apiPath;
+      }
 
       var expr2audio = memoize(function(expr) {
-        if (expr.counterType != CounterType.DAY_OF_MONTH) {
-          throw "IllegalArgumentException";
-        }
-
-        let number = expr.numbers[0];
+        let src = expr2apiPath(expr);
         var source = $("<source />")
-          .attr("src", "https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/day-of-month/" + number)
+          .attr("src", src)
           .attr("type", "audio/mpeg");
         var audio = $("<audio />")
-          .attr("id", "audio-day-of-the-month-" + number)
+          .attr("id", "audio-" + expr.toString())
           .attr("preload", "auto")
           .append(source);
         $(".audios").append(audio);
@@ -247,7 +272,7 @@
 <hr />
 <div class="setting" lang="en">
     <div>
-        Playback content: day of the month
+        Playback content: day of the month, plain numbers
     </div>
     <div>
         Playback speed:
