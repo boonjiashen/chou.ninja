@@ -296,6 +296,24 @@
         return audio;
       });
 
+      class AudioPlayer {
+        constructor() {
+          const dummyAudio = $("<audio />")[0];
+          this._prevAudio = dummyAudio;
+        }
+
+        play($audio) {
+          this._prevAudio.pause();
+          this._prevAudio.currentTime = 0;
+
+          const currAudio = $audio[0];
+          currAudio.playbackRate = getCurrentPlaybackRate();
+          currAudio.play();
+          this._prevAudio = currAudio;
+        }
+      }
+
+      const audioPlayer = new AudioPlayer();
       let trackGenerator = null;
       function initializeTrackGenerator() {
         let counteredExpressions = shuffle(getSelectedExpressions());
@@ -311,7 +329,7 @@
             const track = trackGenerator.next();
             const expr = track.counteredExpression;
             const $audio = track.$audio;
-            play($audio);
+            audioPlayer.play($audio);
             displayAnswer(expr);
             appendToHistory(expr, $audio);
           });
@@ -337,7 +355,7 @@
             .text("[Hear again]")
             .attr("lang", "en")
             .mousedown(function() {
-              play($audio);
+              audioPlayer.play($audio);
             });
           var suffix = $("<span />")
             .append(anchor);
@@ -360,21 +378,6 @@
         return function() {
           var nominalPlaybackRate = $(".playbackRate option:selected").val();
           return playbackRateNominal2Float[nominalPlaybackRate];
-        };
-      })();
-
-      let play = (function() {
-        let dummyAudio = $("<audio />")[0];
-        let prevAudio = dummyAudio;
-
-        return function($audio) {
-          prevAudio.pause();
-          prevAudio.currentTime = 0;
-
-          const currAudio = $audio[0];
-          currAudio.playbackRate = getCurrentPlaybackRate();
-          currAudio.play();
-          prevAudio = currAudio;
         };
       })();
     </script>
