@@ -11,14 +11,17 @@
             border-width: medium;
             font-size: x-large;
             margin-bottom: inherit;
-            background-color: rgb(80,80,80);
+            /*background-color: rgb(80,80,80);*/
             font-weight: bold;
             height: 5em;
             vertical-align: middle;
-            color: white;
+            /*color: white;*/
         }
-        h1, .buttons, .answer, .mode {
+        h1, .buttons, .answer {
             text-align: center;
+        }
+        select {
+            border-width: medium;
         }
         .answer {
             font-size: xx-large;
@@ -27,11 +30,11 @@
             display: none;
         }
         body {
-            color: white;
-            background: black;
+            /*color: white;*/
+            /*background: black;*/
         }
         a {
-            color: darkgray;
+            /*color: darkgray;*/
         ;
         }
     </style>
@@ -78,7 +81,7 @@
       });
 
       var numbers = [];
-      for (var digit = 1; digit <= 10; digit++) {
+      for (var digit = 1; digit <= 31; digit++) {
         numbers.push(digit);
       }
 
@@ -152,6 +155,18 @@
         $(".history > ul").prepend(historyRecord);
       }
 
+      var getCurrentPlaybackRate = (function() {
+        var playbackRateNominal2Float = {
+          "slow": 0.5,
+          "normal": 1,
+          "fast": 1.5
+        };
+        return function() {
+          var nominalPlaybackRate = $(".playbackRate option:selected").val();
+          return playbackRateNominal2Float[nominalPlaybackRate];
+        };
+      })();
+
       var play = (function() {
         var dummyAudio = $("<audio />")[0];
         var prevAudio = dummyAudio;
@@ -161,6 +176,7 @@
           prevAudio.currentTime = 0;
 
           var currAudio = number2audio(number)[0];
+          currAudio.playbackRate = getCurrentPlaybackRate();
           currAudio.play();
           prevAudio = currAudio;
         };
@@ -186,9 +202,20 @@
 </div>
 
 <hr />
-<div class="mode" lang="en">
-    Mode: day of the month
+<div class="setting" lang="en">
+    <div>
+        Playback content: day of the month
+    </div>
+    <div>
+        Playback speed:
+        <select class="playbackRate">
+            <option value="fast">Fast</option>
+            <option value="normal" selected>Normal</option>
+            <option value="slow">Slow</option>
+        </select>
+    </div>
 </div>
+
 <div class="history">
     <hr />
     <div lang="en">
