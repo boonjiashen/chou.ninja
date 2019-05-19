@@ -15,6 +15,9 @@
             height: 5em;
             vertical-align: middle;
         }
+        #answer {
+            font-size: xx-large;
+        }
         body {
             text-align: center;
         }
@@ -25,15 +28,7 @@
         main();
       });
 
-      function constructDayOfMonthHTML(number) {
-          var button = $("<button />")
-            .attr("lang", "ja")
-            .addClass("block")
-            .text(number + "日")
-            .click(function() {
-              play(number);
-            });
-
+      function getDayOfTheMonthAudio(number) {
           var source = $("<source />")
             .attr("src", "https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/day-of-month/" + number)
             .attr("type", "audio/mpeg");
@@ -41,22 +36,56 @@
             .attr("id", "audio-digit-" + number)
             .attr("preload", "none")
             .append(source);
-          $("body").append(button, audio);
+
+          return audio;
+      }
+
+      var numbers = [];
+      var number2audio = {};
+      for (var digit = 1; digit <= 10; digit++) {
+        numbers.push(digit);
+      }
+
+      function constructRandomButton() {
+        var button = $("<button />")
+          .attr("lang", "en")
+          .addClass("block")
+          .text("Play random number")
+          .click(function() {
+            var number = numbers[Math.floor(Math.random() * numbers.length)];
+            play(number);
+            $("#answer").text("Current playing: " + number2text(number));
+          });
+          $("body").append(button);
+      }
+
+      function number2text(number) {
+        return number + "日";
+      }
+
+      function getAnswerDiv() {
+        return $("<div />")
+          .attr("id", "answer")
+          .attr("lang", "ja");
       }
 
       function main() {
-        for (var digit = 1; digit <= 10; digit++) {
-          constructDayOfMonthHTML(digit);
-        }
+        numbers.forEach(function (number) {
+          var audio = getDayOfTheMonthAudio(number);
+          $("body").append(audio);
+          number2audio[number] = audio;
+        })
+        constructRandomButton();
+        $("body").append(getAnswerDiv());
       }
 
       var dummyAudio = $("<audio />")[0];
       var prevAudio = dummyAudio;
-      function play(digit) {
+      function play(number) {
         prevAudio.pause();
         prevAudio.currentTime = 0;
 
-        var currAudio = $("#audio-digit-" + digit)[0];
+        var currAudio = number2audio[number][0];
         currAudio.play();
         prevAudio = currAudio;
       }
