@@ -164,51 +164,57 @@
         }
       }
 
-      class TrackListWithLookAhead {
-        constructor(exprGenerator, expr2audio) {
-          this._trackGenerator = preload(function() {
-            const expression = exprGenerator.next();
-            const $audio = expr2audio(expression);
-
-            return new Track(expression, $audio);
-          });
-          this._currentTrack = this._trackGenerator();
-        }
-
-        nextExpression() {
-          this._currentTrack = this._trackGenerator();
-
-          return this._currentTrack.counteredExpression;
-        }
-
-        getCurrentAudio() {
-          return this._currentTrack.$audio;
-        }
-      }
-
-      class ExpressionGenerator {
+      class Generator {
         next() {
           throw "MethodNotImplementedException";
         }
       }
 
-      class SimpleExpressionGenerator extends ExpressionGenerator {
-        constructor(expressions) {
+      class GeneratorThatShufflesOnEmpty extends Generator {
+        constructor(arr) {
           super();
-          if (expressions.length == 0) {
+          if (arr.length == 0) {
             throw "IllegalArgumentException";
           }
-          this._expressions = expressions;
-          this._remainders = expressions.slice(0);
+          this._arr = arr;
+          this._remainders = arr.slice(0);
         }
 
         next() {
           if (this._remainders.length == 0) {
-            this._remainders = this._expressions.slice(0);
+            this._remainders = this._arr.slice(0);
             this._remainders = shuffle(this._remainders);
           }
           const x = this._remainders.pop();
           return x;
+        }
+      }
+
+      class LookAheadGenerator extends Generator {
+        constructor(gen) {
+          super();
+          this._preloadedGen = preload(function() {
+            return gen.next();
+          })
+        }
+
+        next() {
+          return this._preloadedGen();
+        }
+      }
+
+      class TrackGenerator extends Generator {
+        constructor(exprGenerator, expr2audio) {
+          super()
+          this._exprGenerator = exprGenerator;
+          this._expr2audio = expr2audio;
+        }
+
+        next() {
+          const expression = this._exprGenerator.next();
+          const $audio = this._expr2audio(expression);
+
+          return new Track(expression, $audio);
         }
       }
 
@@ -290,25 +296,27 @@
         return audio;
       });
 
-      let tracklist = null;
-      function initializeTracklist() {
+      let trackGenerator = null;
+      function initializeTrackGenerator() {
         let counteredExpressions = shuffle(getSelectedExpressions());
-        let expressionGenerator = new SimpleExpressionGenerator(counteredExpressions);
-        tracklist = new TrackListWithLookAhead(expressionGenerator, expr2audio);
+        let expressionGenerator = new GeneratorThatShufflesOnEmpty(counteredExpressions);
+        let trackGeneratorWithoutLookAhead = new TrackGenerator(expressionGenerator, expr2audio)
+        trackGenerator = new LookAheadGenerator(trackGeneratorWithoutLookAhead);
       }
 
       function main() {
-        initializeTracklist();
+        initializeTrackGenerator();
         $(".buttons > button")
           .mousedown(function() {
-            const expr = tracklist.nextExpression();
-            const $audio = tracklist.getCurrentAudio();
+            const track = trackGenerator.next();
+            const expr = track.counteredExpression;
+            const $audio = track.$audio;
             play($audio);
             displayAnswer(expr);
             appendToHistory(expr, $audio);
           });
         $(".dayOfWeek, .dayOfMonth, .plainNumber").change(function() {
-          initializeTracklist();
+          initializeTrackGenerator();
         });
       }
 
