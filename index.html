@@ -28,23 +28,71 @@
         main();
       });
 
-      function getDayOfTheMonthAudio(number) {
-          var source = $("<source />")
-            .attr("src", "https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/day-of-month/" + number)
-            .attr("type", "audio/mpeg");
-          var audio = $("<audio />")
-            .attr("id", "audio-digit-" + number)
-            .attr("preload", "none")
-            .append(source);
+      // See https://stackoverflow.com/a/2450976/3606378
+      function shuffle(array) {
+        var currentIndex = array.length, temporaryValue, randomIndex;
 
-          return audio;
+        // While there remain elements to shuffle...
+        while (0 !== currentIndex) {
+
+          // Pick a remaining element...
+          randomIndex = Math.floor(Math.random() * currentIndex);
+          currentIndex -= 1;
+
+          // And swap it with the current element.
+          temporaryValue = array[currentIndex];
+          array[currentIndex] = array[randomIndex];
+          array[randomIndex] = temporaryValue;
+        }
+
+        return array;
+      }
+
+      // See https://codeburst.io/understanding-memoization-in-3-minutes-2e58daf33a19
+      function memoize(func){
+        var cache = {};
+        return function() {
+          var key = JSON.stringify(arguments);
+          if (cache[key]){
+            console.log(cache)
+            return cache[key];
+          }
+          else{
+            var val = func.apply(null, arguments);
+            cache[key] = val;
+            return val;
+          }
+        }
       }
 
       var numbers = [];
-      var number2audio = {};
       for (var digit = 1; digit <= 10; digit++) {
         numbers.push(digit);
       }
+
+      var number2audio = memoize(function(number) {
+        var source = $("<source />")
+          .attr("src", "https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/day-of-month/" + number)
+          .attr("type", "audio/mpeg");
+        var audio = $("<audio />")
+          .attr("id", "audio-digit-" + number)
+          .attr("preload", "none")
+          .append(source);
+
+        return audio;
+      });
+
+      var getNextNumber = (function() {
+        var remainders = [];
+        return function() {
+          if (remainders.length == 0) {
+            remainders = numbers.slice(0);
+            remainders = shuffle(remainders);
+          }
+          var x = remainders.pop();
+          return x;
+        };
+      })();
 
       function constructRandomButton() {
         var button = $("<button />")
@@ -52,7 +100,7 @@
           .addClass("block")
           .text("Play random number")
           .mousedown(function() {
-            var number = numbers[Math.floor(Math.random() * numbers.length)];
+            var number = getNextNumber();
             play(number);
             $("#answer").text("Current playing: " + number2text(number));
           });
@@ -69,26 +117,32 @@
           .attr("lang", "ja");
       }
 
+      function appendToHistory(number) {
+
+      }
+
       function main() {
         numbers.forEach(function (number) {
-          var audio = getDayOfTheMonthAudio(number);
+          var audio = number2audio(number);
           $("body").append(audio);
-          number2audio[number] = audio;
         })
         constructRandomButton();
         $("body").append(getAnswerDiv());
       }
 
-      var dummyAudio = $("<audio />")[0];
-      var prevAudio = dummyAudio;
-      function play(number) {
-        prevAudio.pause();
-        prevAudio.currentTime = 0;
+      var play = (function() {
+        var dummyAudio = $("<audio />")[0];
+        var prevAudio = dummyAudio;
 
-        var currAudio = number2audio[number][0];
-        currAudio.play();
-        prevAudio = currAudio;
-      }
+        return function(number) {
+          prevAudio.pause();
+          prevAudio.currentTime = 0;
+
+          var currAudio = number2audio(number)[0];
+          currAudio.play();
+          prevAudio = currAudio;
+        };
+      })();
     </script>
 </head>
 <body>
