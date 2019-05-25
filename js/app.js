@@ -294,7 +294,7 @@ function main() {
       displayAnswer(expr);
       appendToHistory(expr, $audio);
     });
-  $("form.setting input").change(function() {
+  $(".setting input").change(function() {
     initializeTrackGenerator();
   })
 }
@@ -330,14 +330,14 @@ function appendToHistory(expr, $audio) {
   $(".history > ul").prepend(historyRecord);
 }
 
-var getCurrentPlaybackRate = (function() {
-  var playbackRateNominal2Float = {
+const getCurrentPlaybackRate = (function() {
+  const playbackRateNominal2Float = {
     "slow": 0.8,
     "normal": 1,
     "fast": 1.5
   };
   return function() {
-    var nominalPlaybackRate = $(".playbackRate option:selected").val();
+    const nominalPlaybackRate = $("input[name=\"playbackRate\"]:checked").val();
     return playbackRateNominal2Float[nominalPlaybackRate];
   };
 })();

@@ -37,6 +37,31 @@
             /*color: darkgray;*/
         ;
         }
+        div.table {
+            display: table;
+        }
+
+        div.table > div.thead {
+            display: table-header-group;
+        }
+
+        div.table > div.tbody {
+            display: table-row-group;
+        }
+
+        div.table > div.thead > div.table-row,
+        div.table > div.tbody > div.table-row {
+            display: table-row;
+        }
+
+        div.table > div.thead > div.table-row > div.table-heading {
+            display: table-cell;
+            font-weight: bold;
+        }
+
+        div.table > div.tbody > div.table-row > div.table-cell {
+            display: table-cell;
+        }
     </style>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="js/app.js"></script>
@@ -58,52 +83,72 @@
 </div>
 
 <hr />
-<div class="setting" lang="en">
-    <div>
-        Playback content:
+
+<div class="setting table" lang="en">
+    <div class="thead">
+        <div class="table-row">
+            <div class="table-heading">
+                Playback content
+            </div>
+        </div>
     </div>
-    <form class="setting">
-        <div>
-            <span>Days of the week:</span>
-            <span>
+    <div class="tbody">
+        <div class="table-row">
+            <div class="table-cell">Days of the week:</div>
+            <div class="table-cell">
                 <label>None
                     <input type="radio" name="dayOfWeek" value="none">
                 </label>
                 <label>All
                     <input type="radio" name="dayOfWeek" value="all" checked>
                 </label>
-            </span>
+            </div>
         </div>
-        <div>
-            <span>Days of the month:</span>
-            <span>
+        <div class="table-row">
+            <div class="table-cell">Days of the month:</div>
+            <div class="table-cell">
                 <label>None
                     <input type="radio" name="dayOfMonth" value="none">
                 </label>
                 <label>All
                     <input type="radio" name="dayOfMonth" value="all" checked>
                 </label>
-            </span>
+            </div>
         </div>
-        <div>
-            <span>Plain numbers:</span>
-            <span>
+        <div class="table-row">
+            <div class="table-cell">Plain numbers:</div>
+            <div class="table-cell">
                 <label>None
                     <input type="radio" name="plainNumber" value="none">
                 </label>
                 <label>0 - 10
                     <input type="radio" name="plainNumber" value="zeroToTen" checked>
                 </label>
-            </span>
+            </div>
         </div>
-    </form>
-    <div>
-        Playback speed:
-        <select class="playbackRate">
-            <option value="fast">Fast</option>
-            <option value="normal" selected>Normal</option>
-            <option value="slow">Slow</option>
-        </select>
+    </div>
+    <div class="thead">
+        <div class="table-row">
+            <div class="table-heading">
+                Other settings
+            </div>
+        </div>
+    </div>
+    <div class="tbody">
+        <div class="table-row">
+            <div class="table-cell">Playback speed:</div>
+            <div class="table-cell">
+                <label>Slow
+                    <input type="radio" name="playbackRate" value="slow">
+                </label>
+                <label>Normal
+                    <input type="radio" name="playbackRate" value="normal" checked>
+                </label>
+                <label>Fast
+                    <input type="radio" name="playbackRate" value="fast">
+                </label>
+            </div>
+        </div>
     </div>
 </div>
 
