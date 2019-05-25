@@ -61,27 +61,42 @@
 <div class="setting" lang="en">
     <div>
         Playback content:
-        <ul>
-            <li>Days of the month:
-                <select class="dayOfMonth">
-                    <option value="none">None</option>
-                    <option value="all" selected>All</option>
-                </select>
-            </li>
-            <li>Days of the week
-                <select class="dayOfWeek">
-                    <option value="none">None</option>
-                    <option value="all" selected>All</option>
-                </select>
-            </li>
-            <li>Plain numbers
-                <select class="plainNumber">
-                    <option value="none">None</option>
-                    <option value="zeroToTen" selected>0 - 10</option>
-                </select>
-            </li>
-        </ul>
     </div>
+    <form class="setting">
+        <fieldset>
+            <legend>Days of the week:</legend>
+            <div>
+                <label>None
+                    <input type="radio" name="dayOfWeek" value="none">
+                </label>
+                <label>All
+                    <input type="radio" name="dayOfWeek" value="all" checked>
+                </label>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Days of the month:</legend>
+            <div>
+                <label>None
+                    <input type="radio" name="dayOfMonth" value="none">
+                </label>
+                <label>All
+                    <input type="radio" name="dayOfMonth" value="all" checked>
+                </label>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Plain numbers:</legend>
+            <div>
+                <label>None
+                    <input type="radio" name="plainNumber" value="none">
+                </label>
+                <label>0 - 10
+                    <input type="radio" name="plainNumber" value="zeroToTen" checked>
+                </label>
+            </div>
+        </fieldset>
+    </form>
     <div>
         Playback speed:
         <select class="playbackRate">

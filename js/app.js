@@ -181,8 +181,11 @@ $(window).on('load', function() {
 });
 
 function getSelectedExpressions() {
+  function getSelection(name) {
+    return $("input[name=" + name + "]:checked").val();
+  }
   function getDaysOfMonth() {
-    let selection =  $(".dayOfMonth option:selected").val();
+    let selection =  getSelection("dayOfMonth");
     if ("none" == selection) {
       return [];
     }
@@ -194,7 +197,7 @@ function getSelectedExpressions() {
   }
 
   function getDaysOfWeek() {
-    let selection =  $(".dayOfWeek option:selected").val();
+    let selection =  getSelection("dayOfWeek");
     if ("none" == selection) {
       return [];
     }
@@ -206,7 +209,7 @@ function getSelectedExpressions() {
   }
 
   function getPlainNumbers() {
-    let selection =  $(".plainNumber option:selected").val();
+    let selection = getSelection("plainNumber");
     if ("none" == selection) {
       return [];
     }
@@ -291,9 +294,9 @@ function main() {
       displayAnswer(expr);
       appendToHistory(expr, $audio);
     });
-  $(".dayOfWeek, .dayOfMonth, .plainNumber").change(function() {
+  $("form.setting input").change(function() {
     initializeTrackGenerator();
-  });
+  })
 }
 
 function displayAnswer(expr) {
