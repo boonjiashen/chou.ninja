@@ -6,7 +6,9 @@ Parameters:
     Type: String
   APIGatewayRoleARN:
     Type: String
-  SoundClipsBucket:
+  PathPartOfResourceParent:
+    Type: String
+  MethodIntegrationURI:
     Type: String
 Resources:
   ResourceParent:
@@ -14,19 +16,19 @@ Resources:
     Properties:
       RestApiId: !Ref RESTApiID
       ParentId: !Ref RESTApiRootResourceID
-      PathPart: day-of-month
+      PathPart: !Ref PathPartOfResourceParent
   ResourceChild:
     Type: 'AWS::ApiGateway::Resource'
     Properties:
       RestApiId: !Ref RESTApiID
       ParentId: !Ref ResourceParent
-      PathPart: "{day}"
-  DayOfMonthMethod:
+      PathPart: "{pathVariable}"
+  Method:
     Type: AWS::ApiGateway::Method
     Properties:
       HttpMethod: GET
       RequestParameters:
-        "method.request.path.day": true
+        "method.request.path.pathVariable": true
       ResourceId: !Ref ResourceChild
       RestApiId: !Ref RESTApiID
       AuthorizationType: NONE
@@ -36,10 +38,10 @@ Resources:
         IntegrationHttpMethod: GET
         IntegrationResponses:
           - StatusCode: 200
+        # For syntax instructions, see https://stackoverflow.com/a/54974119/3606378
         RequestParameters:
-          # For syntax instructions, see https://stackoverflow.com/a/54974119/3606378
-          "integration.request.path.day": "method.request.path.day"
-        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:s3:path/${SoundClipsBucket}/sound-clips/days-of-month/{day}.mp3"
+          "integration.request.path.pathVariable": !Sub "method.request.path.pathVariable"
+        Uri: !Ref MethodIntegrationURI
       # Example API Gateway CFN template https://gist.github.com/sihil/93126ca8f319496c921a6077270fcd18
       MethodResponses:
         - StatusCode: 200

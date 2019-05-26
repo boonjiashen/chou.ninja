@@ -14,13 +14,16 @@ Resources:
     Type: 'AWS::ApiGateway::Deployment'
     DependsOn:
       - DayOfTheMonthMethodStack
+      - DayOfTheWeekMethodStack
+      - DigitMethodStack
+      - MonthOfTheYearMethodStack
     Properties:
       RestApiId: !Ref RestApi
   ProdStage:
     Type: AWS::ApiGateway::Stage
     Properties:
       DeploymentId: !Ref DeploymentToProd
-      StageName: Prod
+      StageName: "Prod"
       RestApiId: !Ref RestApi
   APIGRole:
     Type: "AWS::IAM::Role"
@@ -45,5 +48,36 @@ Resources:
         RESTApiID: !Ref RestApi
         RESTApiRootResourceID: !GetAtt RestApi.RootResourceId
         APIGatewayRoleARN: !GetAtt APIGRole.Arn
-        SoundClipsBucket: !Ref SoundClipsBucket
+        PathPartOfResourceParent: "day-of-month"
+        MethodIntegrationURI: !Sub "arn:aws:apigateway:${AWS::Region}:s3:path/${SoundClipsBucket}/sound-clips/days-of-month/{pathVariable}.mp3"
+      TemplateURL: "method.yml"
+  DayOfTheWeekMethodStack:
+    Type: "AWS::CloudFormation::Stack"
+    Properties:
+      Parameters:
+        RESTApiID: !Ref RestApi
+        RESTApiRootResourceID: !GetAtt RestApi.RootResourceId
+        APIGatewayRoleARN: !GetAtt APIGRole.Arn
+        PathPartOfResourceParent: "day-of-week"
+        MethodIntegrationURI: !Sub "arn:aws:apigateway:${AWS::Region}:s3:path/${SoundClipsBucket}/sound-clips/days-of-week/{pathVariable}.mp3"
+      TemplateURL: "method.yml"
+  DigitMethodStack:
+    Type: "AWS::CloudFormation::Stack"
+    Properties:
+      Parameters:
+        RESTApiID: !Ref RestApi
+        RESTApiRootResourceID: !GetAtt RestApi.RootResourceId
+        APIGatewayRoleARN: !GetAtt APIGRole.Arn
+        PathPartOfResourceParent: "digit"
+        MethodIntegrationURI: !Sub "arn:aws:apigateway:${AWS::Region}:s3:path/${SoundClipsBucket}/sound-clips/digits/{pathVariable}.mp3"
+      TemplateURL: "method.yml"
+  MonthOfTheYearMethodStack:
+    Type: "AWS::CloudFormation::Stack"
+    Properties:
+      Parameters:
+        RESTApiID: !Ref RestApi
+        RESTApiRootResourceID: !GetAtt RestApi.RootResourceId
+        APIGatewayRoleARN: !GetAtt APIGRole.Arn
+        PathPartOfResourceParent: "month-of-year"
+        MethodIntegrationURI: !Sub "arn:aws:apigateway:${AWS::Region}:s3:path/${SoundClipsBucket}/sound-clips/months-of-year/{pathVariable}.mp3"
       TemplateURL: "method.yml"
