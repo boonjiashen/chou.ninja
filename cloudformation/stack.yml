@@ -7,16 +7,16 @@ Resources:
     Type: AWS::ApiGateway::RestApi
     Properties:
       Name: !Sub "${AWS::StackName}-api"
-  GatewayResponse:
-    Type: AWS::ApiGateway::GatewayResponse
+      BinaryMediaTypes:
+        - audio/mpeg
+        - application/octet-stream
+  ProdStage:
+    Type: 'AWS::ApiGateway::Deployment'
+    DependsOn:
+      - DayOfMonthMethod
     Properties:
-      ResponseParameters:
-        gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
-        gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
-      ResponseType: MISSING_AUTHENTICATION_TOKEN
       RestApiId: !Ref RestApi
-      StatusCode: '404'
-
+      StageName: prod
   APIGRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -30,6 +30,8 @@ Resources:
                 - "apigateway.amazonaws.com"
             Action:
               - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
 
   DayOfMonthParent:
     Type: 'AWS::ApiGateway::Resource'
@@ -58,7 +60,14 @@ Resources:
         Credentials: !GetAtt APIGRole.Arn
         Type: AWS
         IntegrationHttpMethod: GET
+        IntegrationResponses:
+          - StatusCode: 200
         RequestParameters:
           # For syntax instructions, see https://stackoverflow.com/a/54974119/3606378
           "integration.request.path.day": "method.request.path.day"
         Uri: !Sub "arn:aws:apigateway:${AWS::Region}:s3:path/${SoundClipsBucket}/days-of-month/{day}.mp3"
+      # Example API Gateway CFN template https://gist.github.com/sihil/93126ca8f319496c921a6077270fcd18
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
