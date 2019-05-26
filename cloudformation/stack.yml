@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  SoundClipsBucket:
+    Type: AWS::S3::Bucket
+    Properties: {}
+  RestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: ${AWS::StackName}
+  GatewayResponse:
+    Type: AWS::ApiGateway::GatewayResponse
+    Properties:
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+        gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+      ResponseType: MISSING_AUTHENTICATION_TOKEN
+      RestApiId: !Ref RestApi
+      StatusCode: '404'
+
+  APIGRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "apigateway.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+
+  DayOfMonthParent:
+    Type: 'AWS::ApiGateway::Resource'
+    Properties:
+      RestApiId: !Ref RestApi
+      ParentId: !GetAtt
+        - RestApi
+        - RootResourceId
+      PathPart: day-of-month
+  DayOfMonthChild:
+    Type: 'AWS::ApiGateway::Resource'
+    Properties:
+      RestApiId: !Ref RestApi
+      ParentId: !Ref DayOfMonthParent
+      PathPart: "{day}"
+  DayOfMonthMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: GET
+      ResourceId: !Ref DayOfMonthChild
+      RestApiId: !Ref RestApi
+      AuthorizationType: NONE
+      Integration:
+        Credentials: !GetAtt APIGRole.Arn
+        Type: AWS
+        IntegrationHttpMethod: GET
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:s3:path/${SoundClipsBucket}/days-of-month/{day}.mp3"
