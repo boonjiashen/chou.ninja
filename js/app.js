@@ -329,6 +329,11 @@ function main() {
   $(".setting input").change(function() {
     initializeTrackGenerator();
   })
+  $(".clearPlaybackContent").click(function () {
+    $(".setting input[value='none']")
+      .prop('checked', true)
+      .change();
+  })
 }
 
 function displayAnswer(expr) {
