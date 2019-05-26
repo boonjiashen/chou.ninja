@@ -10,13 +10,18 @@ Resources:
       BinaryMediaTypes:
         - audio/mpeg
         - application/octet-stream
-  ProdStage:
+  DeploymentToProd:
     Type: 'AWS::ApiGateway::Deployment'
     DependsOn:
-      - DayOfMonthMethod
+      - DayOfTheMonthMethodStack
     Properties:
       RestApiId: !Ref RestApi
-      StageName: prod
+  ProdStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId: !Ref DeploymentToProd
+      StageName: Prod
+      RestApiId: !Ref RestApi
   APIGRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -33,41 +38,12 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess
 
-  DayOfMonthParent:
-    Type: 'AWS::ApiGateway::Resource'
+  DayOfTheMonthMethodStack:
+    Type: "AWS::CloudFormation::Stack"
     Properties:
-      RestApiId: !Ref RestApi
-      ParentId: !GetAtt
-        - RestApi
-        - RootResourceId
-      PathPart: day-of-month
-  DayOfMonthChild:
-    Type: 'AWS::ApiGateway::Resource'
-    Properties:
-      RestApiId: !Ref RestApi
-      ParentId: !Ref DayOfMonthParent
-      PathPart: "{day}"
-  DayOfMonthMethod:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      HttpMethod: GET
-      RequestParameters:
-        "method.request.path.day": true
-      ResourceId: !Ref DayOfMonthChild
-      RestApiId: !Ref RestApi
-      AuthorizationType: NONE
-      Integration:
-        Credentials: !GetAtt APIGRole.Arn
-        Type: AWS
-        IntegrationHttpMethod: GET
-        IntegrationResponses:
-          - StatusCode: 200
-        RequestParameters:
-          # For syntax instructions, see https://stackoverflow.com/a/54974119/3606378
-          "integration.request.path.day": "method.request.path.day"
-        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:s3:path/${SoundClipsBucket}/days-of-month/{day}.mp3"
-      # Example API Gateway CFN template https://gist.github.com/sihil/93126ca8f319496c921a6077270fcd18
-      MethodResponses:
-        - StatusCode: 200
-          ResponseModels:
-            application/json: Empty
+      Parameters:
+        RESTApiID: !Ref RestApi
+        RESTApiRootResourceID: !GetAtt RestApi.RootResourceId
+        APIGatewayRoleARN: !GetAtt APIGRole.Arn
+        SoundClipsBucket: !Ref SoundClipsBucket
+      TemplateURL: "method.yml"
