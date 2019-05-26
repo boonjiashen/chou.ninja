@@ -49,6 +49,8 @@ Resources:
     Type: AWS::ApiGateway::Method
     Properties:
       HttpMethod: GET
+      RequestParameters:
+        "method.request.path.day": true
       ResourceId: !Ref DayOfMonthChild
       RestApiId: !Ref RestApi
       AuthorizationType: NONE
@@ -56,4 +58,7 @@ Resources:
         Credentials: !GetAtt APIGRole.Arn
         Type: AWS
         IntegrationHttpMethod: GET
+        RequestParameters:
+          # For syntax instructions, see https://stackoverflow.com/a/54974119/3606378
+          "integration.request.path.day": "method.request.path.day"
         Uri: !Sub "arn:aws:apigateway:${AWS::Region}:s3:path/${SoundClipsBucket}/days-of-month/{day}.mp3"
