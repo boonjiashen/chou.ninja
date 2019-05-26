@@ -48,7 +48,8 @@ function preload(func) {
 const CounterType = {
   "DAY_OF_MONTH": {"string": "day-of-month", "value": 1},
   "DAY_OF_WEEK": {"string": "day-of-week", "value": 2},
-  "PLAIN_NUMBER": {"string": "plain-number", "value": 3}
+  "PLAIN_NUMBER": {"string": "plain-number", "value": 3},
+  "MONTH_OF_YEAR": {"string": "month-of-year", "value": 4}
 };
 
 class CounteredExpression {
@@ -68,6 +69,21 @@ class DayOfMonthExpression extends CounteredExpression {
     super([number]);
     this.counters = ["日"];
     this.counterType = CounterType.DAY_OF_MONTH;
+  }
+
+  toString() {
+    return this.numbers[0] + this.counters[0];
+  }
+}
+
+class MonthOfYearExpression extends CounteredExpression {
+  constructor(number) {
+    if (number > 12 || number < 1) {
+      throw "IllegalArgumentException";
+    }
+    super([number]);
+    this.counters = ["月"];
+    this.counterType = CounterType.MONTH_OF_YEAR;
   }
 
   toString() {
@@ -220,7 +236,19 @@ function getSelectedExpressions() {
     return items;
   }
 
-  const expressions = [].concat(getDaysOfMonth(), getDaysOfWeek(), getPlainNumbers());
+  function getMonthsOfYear() {
+    let selection = getSelection("monthOfYear");
+    if ("none" == selection) {
+      return [];
+    }
+    let items = [];
+    for (let x = 1; x <= 12; x++) {
+      items.push(new MonthOfYearExpression(x));
+    }
+    return items;
+  }
+
+  const expressions = [].concat(getDaysOfMonth(), getDaysOfWeek(), getPlainNumbers(), getMonthsOfYear());
   if (expressions.length == 0) {
     throw "IncorrectUserInputException";
   }
@@ -229,17 +257,21 @@ function getSelectedExpressions() {
 }
 
 function expr2apiPath(expr) {
+  const API_PREFIX = "https://6xeipdrp36.execute-api.ap-northeast-1.amazonaws.com/Prod"
   let number = expr.numbers[0];
   let apiPath = null;
   if (expr.counterType == CounterType.PLAIN_NUMBER) {
-    apiPath = "https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/digit/" + number;
+    apiPath = API_PREFIX + "/digit/" + number;
   }
   if (expr.counterType == CounterType.DAY_OF_MONTH) {
-    apiPath = "https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/day-of-month/" + number;
+    apiPath = API_PREFIX + "/day-of-month/" + number;
   }
   if (expr.counterType == CounterType.DAY_OF_WEEK) {
     let char = DayOfWeekExpression.int2char(number);
-    apiPath = "https://px0asnk62c.execute-api.ap-northeast-1.amazonaws.com/prod/day-of-week/" + char;
+    apiPath = API_PREFIX + "/day-of-week/" + char;
+  }
+  if (expr.counterType == CounterType.MONTH_OF_YEAR) {
+    apiPath = API_PREFIX + "/month-of-year/" + number;
   }
   return apiPath;
 }
