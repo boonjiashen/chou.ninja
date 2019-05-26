@@ -6,7 +6,7 @@ Resources:
   RestApi:
     Type: AWS::ApiGateway::RestApi
     Properties:
-      Name: ${AWS::StackName}
+      Name: !Sub "${AWS::StackName}-api"
   GatewayResponse:
     Type: AWS::ApiGateway::GatewayResponse
     Properties:

@@ -2,7 +2,7 @@
 
 export AWS_DEFAULT_REGION="ap-northeast-1"
 
-STACK_NAME="api-gateway-3"
+STACK_NAME="api-gateway-5"
 TEMPLATE_FILE="cloudformation/stack.yml"
 
 aws cloudformation deploy  \
