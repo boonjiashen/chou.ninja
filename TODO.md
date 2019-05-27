@@ -1,4 +1,4 @@
-### TODO
+# TODO
 
 ## Features
 * Make playback rate part of history (should we?)
@@ -12,3 +12,6 @@
 
 ## Cost savings
 * Restrict APIG to only this website
+
+## Operations
+* Add traffic tracker
