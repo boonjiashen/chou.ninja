@@ -1,10 +1,8 @@
 export class AudioPlayer {
-  #prevAudio = null;
+  #prevAudio = $("<audio />")[0];
   #playbackRateGetter = function() {};
 
   constructor(playbackRateGetter) {
-    const dummyAudio = $("<audio />")[0];
-    this.#prevAudio = dummyAudio;
     this.#playbackRateGetter = playbackRateGetter;
   }
 
