@@ -34,14 +34,16 @@ function range(start, end) {
   return Array(end - start).fill().map((_, idx) => start + idx)
 }
 
+
+const NONE = "none";
 const daysOfMonthSupplier = new ExpressionsSupplier(
   function() {
     return getSelection("dayOfMonth");
   },
-  {
-    "none": [],
-    "all": range(1, 32)
-  },
+  new Map([
+    [NONE, []],
+    ["all", range(1, 32)]
+  ]),
   DayOfMonthExpression
 );
 
@@ -49,10 +51,10 @@ const daysOfWeekSupplier = new ExpressionsSupplier(
   function() {
     return getSelection("dayOfWeek");
   },
-  {
-    "none": [],
-    "all": range(1, 8)
-  },
+  new Map([
+    [NONE, []],
+    ["all", range(1, 8)]
+  ]),
   DayOfWeekExpression
 );
 
@@ -60,10 +62,10 @@ const plainNumbersSupplier = new ExpressionsSupplier(
   function() {
     return getSelection("plainNumber");
   },
-  {
-    "none": [],
-    "zeroToTen": range(0, 11)
-  },
+  new Map([
+    [NONE, []],
+    ["zeroToTen", range(0, 11)]
+  ]),
   CounterlessExpression
 );
 
@@ -71,10 +73,10 @@ const monthsOfYearSupplier = new ExpressionsSupplier(
   function() {
     return getSelection("monthOfYear");
   },
-  {
-    "none": [],
-    "all": range(1, 13)
-  },
+  new Map([
+    [NONE, []],
+    ["all", range(1, 13)]
+  ]),
   MonthOfYearExpression
 );
 
@@ -163,7 +165,7 @@ function main() {
     initializeTrackGenerator();
   })
   $(".clearPlaybackContent").click(function () {
-    $(".setting input[value='none']")
+    $(".setting input[value=\"" + NONE + "\"]")
       .prop('checked', true)
       .change();
   })

@@ -7,10 +7,8 @@ export class Supplier {
 export class ExpressionsSupplier extends Supplier {
 
   _selectionGetter = function() {};
-  _selection2range = {
-    "none": []
-  }
-  _Class = null;
+  _selection2range = new Map();
+  _Class = Object;
 
   constructor(selectionGetter, selection2range, Class) {
     super();
@@ -21,7 +19,7 @@ export class ExpressionsSupplier extends Supplier {
 
   get() {
     const selection = this._selectionGetter();
-    const constructorArgsList = this._selection2range[selection];
+    const constructorArgsList = this._selection2range.get(selection);
 
     return constructorArgsList.map(constructorArgs =>
       new this._Class(constructorArgs)
