@@ -80,15 +80,16 @@ class PlaybackRateSupplier extends Supplier {
 const playbackRateSupplier = new PlaybackRateSupplier();
 const audioPlayer = new AudioPlayer(() => playbackRateSupplier.get());
 let trackGenerator = null;
-function initializeTrackGenerator() {
+
+function getTrackGenerator() {
   let counteredExpressions = shuffle(getSelectedExpressions());
   let expressionGenerator = new GeneratorThatShufflesOnEmpty(counteredExpressions);
   let trackGeneratorWithoutLookAhead = new TrackGenerator(expressionGenerator, expr2audio);
-  trackGenerator = new LookAheadGenerator(trackGeneratorWithoutLookAhead);
+  return new LookAheadGenerator(trackGeneratorWithoutLookAhead);
 }
 
 function main() {
-  initializeTrackGenerator();
+  trackGenerator = getTrackGenerator();
   $(".buttons > button")
     .mousedown(function() {
       const track = trackGenerator.next();
@@ -99,7 +100,7 @@ function main() {
       appendToHistory(expr, $audio);
     });
   $(".setting input").change(function() {
-    initializeTrackGenerator();
+    trackGenerator = getTrackGenerator();
   })
   $(".clearPlaybackContent").click(function () {
     $(".setting input[value=\"" + NONE + "\"]")
