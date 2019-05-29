@@ -21,59 +21,123 @@ $(window).on('load', function() {
   main();
 });
 
+class Supplier {
+  get() {
+    throw "MethodNotImplementedException";
+  }
+}
+
+class ExpressionsSupplier extends Supplier {
+
+  _selectionGetter = function() {};
+  _selection2range = {
+    "none": []
+  }
+  _Class = null;
+
+  constructor(selectionGetter, selection2range, Class) {
+    super();
+    this._selectionGetter = selectionGetter;
+    this._selection2range = selection2range;
+    this._Class = Class;
+  }
+
+  get() {
+    const selection = this._selectionGetter();
+    const range = this._selection2range[selection];
+    let expressions = [];
+    for (let i = 0; i < range.length; ++i) {
+      const constructorArgs = range[i];
+      const item = new this._Class(constructorArgs);
+      expressions.push(item);
+    }
+
+    return expressions;
+  }
+}
+
+function getSelection(name) {
+  return $("input[name=" + name + "]:checked").val();
+}
+
+// Returns [start, start + 1, ..., end - 1]
+function range(start, end) {
+  return Array(end - start).fill().map((_, idx) => start + idx)
+}
+
+const daysOfMonthSupplier = new ExpressionsSupplier(
+  function() {
+    return getSelection("dayOfMonth");
+  },
+  {
+    "none": [],
+    "all": range(1, 32)
+  },
+  DayOfMonthExpression
+);
+
+const daysOfWeekSupplier = new ExpressionsSupplier(
+  function() {
+    return getSelection("dayOfWeek");
+  },
+  {
+    "none": [],
+    "all": range(1, 8)
+  },
+  DayOfWeekExpression
+);
+
+const plainNumbersSupplier = new ExpressionsSupplier(
+  function() {
+    return getSelection("plainNumber");
+  },
+  {
+    "none": [],
+    "zeroToTen": range(0, 11)
+  },
+  CounterlessExpression
+);
+
+const monthsOfYearSupplier = new ExpressionsSupplier(
+  function() {
+    return getSelection("monthOfYear");
+  },
+  {
+    "none": [],
+    "all": range(1, 13)
+  },
+  MonthOfYearExpression
+);
+
+class ConcatenatedListSupplier extends Supplier {
+  #listSuppliers = [];
+
+  constructor(listSuppliers) {
+    super();
+    this.#listSuppliers = listSuppliers;
+  }
+
+  get() {
+    let result = [];
+    for (let i = 0; i < this.#listSuppliers.length; ++i) {
+      const listSupplier = this.#listSuppliers[i];
+      const list = listSupplier.get();
+      result.push(...list);
+    }
+
+    return result;
+  }
+}
+
+const selectedExpressionsSupplier = new ConcatenatedListSupplier([
+  daysOfMonthSupplier,
+  daysOfWeekSupplier,
+  plainNumbersSupplier,
+  monthsOfYearSupplier
+  ]);
+
 function getSelectedExpressions() {
-  function getSelection(name) {
-    return $("input[name=" + name + "]:checked").val();
-  }
-  function getDaysOfMonth() {
-    let selection =  getSelection("dayOfMonth");
-    if ("none" == selection) {
-      return [];
-    }
-    let items = [];
-    for (let x = 1; x <= 31; x++) {
-      items.push(new DayOfMonthExpression(x));
-    }
-    return items;
-  }
-
-  function getDaysOfWeek() {
-    let selection =  getSelection("dayOfWeek");
-    if ("none" == selection) {
-      return [];
-    }
-    let items = [];
-    for (let x = 1; x <= 7; x++) {
-      items.push(new DayOfWeekExpression(x));
-    }
-    return items;
-  }
-
-  function getPlainNumbers() {
-    let selection = getSelection("plainNumber");
-    if ("none" == selection) {
-      return [];
-    }
-    let items = [];
-    for (let x = 0; x <= 10; x++) {
-      items.push(new CounterlessExpression(x));
-    }
-    return items;
-  }
-
-  function getMonthsOfYear() {
-    let selection = getSelection("monthOfYear");
-    if ("none" == selection) {
-      return [];
-    }
-    let items = [];
-    for (let x = 1; x <= 12; x++) {
-      items.push(new MonthOfYearExpression(x));
-    }
-    return items;
-  }
-
-  const expressions = [].concat(getDaysOfMonth(), getDaysOfWeek(), getPlainNumbers(), getMonthsOfYear());
+  const expressions = selectedExpressionsSupplier.get();
   if (expressions.length == 0) {
     throw "IncorrectUserInputException";
   }
