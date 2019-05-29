@@ -55,6 +55,17 @@ export class MonthOfYearExpression extends CounteredExpression {
 }
 
 export class DayOfWeekExpression extends CounteredExpression {
+
+  static #map = {
+    1: "月",
+    2: "火",
+    3: "水",
+    4: "木",
+    5: "金",
+    6: "土",
+    7: "日"
+  };
+
   constructor(number) {
     if (number > 7 || number < 1) {
       throw "IllegalArgumentException";
@@ -65,16 +76,7 @@ export class DayOfWeekExpression extends CounteredExpression {
   }
 
   static int2char(i) {
-    const map = {
-      1: "月",
-      2: "火",
-      3: "水",
-      4: "木",
-      5: "金",
-      6: "土",
-      7: "日"
-    }
-    return map[i];
+    return DayOfWeekExpression.#map[i];
   }
 
   toString() {
