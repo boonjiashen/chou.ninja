@@ -16,45 +16,14 @@ import {
   TrackGenerator
 } from "./Generator.mjs";
 import {AudioPlayer} from "./AudioPlayer.mjs";
+import {
+  ConcatenatedListSupplier,
+  ExpressionsSupplier
+} from "./Supplier.mjs";
 
 $(window).on('load', function() {
   main();
 });
-
-class Supplier {
-  get() {
-    throw "MethodNotImplementedException";
-  }
-}
-
-class ExpressionsSupplier extends Supplier {
-
-  _selectionGetter = function() {};
-  _selection2range = {
-    "none": []
-  }
-  _Class = null;
-
-  constructor(selectionGetter, selection2range, Class) {
-    super();
-    this._selectionGetter = selectionGetter;
-    this._selection2range = selection2range;
-    this._Class = Class;
-  }
-
-  get() {
-    const selection = this._selectionGetter();
-    const range = this._selection2range[selection];
-    let expressions = [];
-    for (let i = 0; i < range.length; ++i) {
-      const constructorArgs = range[i];
-      const item = new this._Class(constructorArgs);
-      expressions.push(item);
-    }
-
-    return expressions;
-  }
-}
 
 function getSelection(name) {
   return $("input[name=" + name + "]:checked").val();
@@ -108,26 +77,6 @@ const monthsOfYearSupplier = new ExpressionsSupplier(
   },
   MonthOfYearExpression
 );
-
-class ConcatenatedListSupplier extends Supplier {
-  #listSuppliers = [];
-
-  constructor(listSuppliers) {
-    super();
-    this.#listSuppliers = listSuppliers;
-  }
-
-  get() {
-    let result = [];
-    for (let i = 0; i < this.#listSuppliers.length; ++i) {
-      const listSupplier = this.#listSuppliers[i];
-      const list = listSupplier.get();
-      result.push(...list);
-    }
-
-    return result;
-  }
-}
 
 const selectedExpressionsSupplier = new ConcatenatedListSupplier([
   daysOfMonthSupplier,
