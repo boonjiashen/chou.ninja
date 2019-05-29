@@ -16,9 +16,7 @@ function getSelection(name) {
 
 export const NONE = "none";
 const daysOfMonthSupplier = new ExpressionsSupplier(
-  function() {
-    return getSelection("dayOfMonth");
-  },
+  () => getSelection("dayOfMonth"),
   new Map([
     [NONE, []],
     ["all", range(1, 32)]
@@ -27,9 +25,7 @@ const daysOfMonthSupplier = new ExpressionsSupplier(
 );
 
 const daysOfWeekSupplier = new ExpressionsSupplier(
-  function() {
-    return getSelection("dayOfWeek");
-  },
+  () => getSelection("dayOfWeek"),
   new Map([
     [NONE, []],
     ["all", range(1, 8)]
@@ -38,9 +34,7 @@ const daysOfWeekSupplier = new ExpressionsSupplier(
 );
 
 const plainNumbersSupplier = new ExpressionsSupplier(
-  function() {
-    return getSelection("plainNumber");
-  },
+  () => getSelection("plainNumber"),
   new Map([
     [NONE, []],
     ["zeroToTen", range(0, 11)]
@@ -49,9 +43,7 @@ const plainNumbersSupplier = new ExpressionsSupplier(
 );
 
 const monthsOfYearSupplier = new ExpressionsSupplier(
-  function() {
-    return getSelection("monthOfYear");
-  },
+  () => getSelection("monthOfYear"),
   new Map([
     [NONE, []],
     ["all", range(1, 13)]
