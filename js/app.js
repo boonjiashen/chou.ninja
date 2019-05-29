@@ -9,12 +9,13 @@ import {
   MonthOfYearExpression,
   DayOfWeekExpression,
   DayOfMonthExpression
-} from "./counteredExpression.mjs";
+} from "./CounteredExpression.mjs";
 import {
   GeneratorThatShufflesOnEmpty,
   LookAheadGenerator,
   TrackGenerator
-} from "./generator.mjs";
+} from "./Generator.mjs";
+import {AudioPlayer} from "./AudioPlayer.mjs";
 
 $(window).on('load', function() {
   main();
@@ -112,27 +113,6 @@ var expr2audio = memoize(function(expr) {
 
   return audio;
 });
-
-class AudioPlayer {
-  #prevAudio = null;
-  #playbackRateGetter = function() {};
-
-  constructor(playbackRateGetter) {
-    const dummyAudio = $("<audio />")[0];
-    this.#prevAudio = dummyAudio;
-    this.#playbackRateGetter = playbackRateGetter;
-  }
-
-  play($audio) {
-    this.#prevAudio.pause();
-    this.#prevAudio.currentTime = 0;
-
-    const currAudio = $audio[0];
-    currAudio.playbackRate = this.#playbackRateGetter();
-    currAudio.play();
-    this.#prevAudio = currAudio;
-  }
-}
 
 const getCurrentPlaybackRate = (function() {
   const playbackRateNominal2Float = {

@@ -1,5 +1,5 @@
 import {preload, shuffle} from "./utils.mjs";
-import {Track} from "./track.mjs";
+import {Track} from "./Track.mjs";
 
 export class Generator {
   next() {
