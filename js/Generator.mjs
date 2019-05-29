@@ -17,7 +17,7 @@ export class GeneratorThatShufflesOnEmpty extends Generator {
     if (arr.length == 0) {
       throw "IllegalArgumentException";
     }
-    this.#arr = arr;
+    this.#arr = arr.slice(0);
     this.#remainders = arr.slice(0);
   }
 
