@@ -43,3 +43,8 @@ export function preload(func) {
     return toBeReturned;
   }
 }
+
+// Returns [start, start + 1, ..., end - 1]
+export function range(start, end) {
+  return Array(end - start).fill().map((_, idx) => start + idx)
+}

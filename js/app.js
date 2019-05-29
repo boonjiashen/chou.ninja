@@ -1,14 +1,10 @@
 import {
   shuffle,
-  memoize,
-  preload
+  memoize
 } from "./utils.mjs";
 import {
-  CounterlessExpression,
   CounteredExpression,
-  MonthOfYearExpression,
-  DayOfWeekExpression,
-  DayOfMonthExpression
+  DayOfWeekExpression
 } from "./CounteredExpression.mjs";
 import {
   GeneratorThatShufflesOnEmpty,
@@ -17,75 +13,13 @@ import {
 } from "./Generator.mjs";
 import {AudioPlayer} from "./AudioPlayer.mjs";
 import {
-  ConcatenatedListSupplier,
-  ExpressionsSupplier
-} from "./Supplier.mjs";
+  selectedExpressionsSupplier,
+  NONE
+} from "./expressionsSupplier.mjs";
 
 $(window).on('load', function() {
   main();
 });
-
-function getSelection(name) {
-  return $("input[name=" + name + "]:checked").val();
-}
-
-// Returns [start, start + 1, ..., end - 1]
-function range(start, end) {
-  return Array(end - start).fill().map((_, idx) => start + idx)
-}
-
-
-const NONE = "none";
-const daysOfMonthSupplier = new ExpressionsSupplier(
-  function() {
-    return getSelection("dayOfMonth");
-  },
-  new Map([
-    [NONE, []],
-    ["all", range(1, 32)]
-  ]),
-  DayOfMonthExpression
-);
-
-const daysOfWeekSupplier = new ExpressionsSupplier(
-  function() {
-    return getSelection("dayOfWeek");
-  },
-  new Map([
-    [NONE, []],
-    ["all", range(1, 8)]
-  ]),
-  DayOfWeekExpression
-);
-
-const plainNumbersSupplier = new ExpressionsSupplier(
-  function() {
-    return getSelection("plainNumber");
-  },
-  new Map([
-    [NONE, []],
-    ["zeroToTen", range(0, 11)]
-  ]),
-  CounterlessExpression
-);
-
-const monthsOfYearSupplier = new ExpressionsSupplier(
-  function() {
-    return getSelection("monthOfYear");
-  },
-  new Map([
-    [NONE, []],
-    ["all", range(1, 13)]
-  ]),
-  MonthOfYearExpression
-);
-
-const selectedExpressionsSupplier = new ConcatenatedListSupplier([
-  daysOfMonthSupplier,
-  daysOfWeekSupplier,
-  plainNumbersSupplier,
-  monthsOfYearSupplier
-  ]);
 
 function getSelectedExpressions() {
   const expressions = selectedExpressionsSupplier.get();
