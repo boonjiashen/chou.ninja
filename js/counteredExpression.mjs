@@ -15,7 +15,13 @@ export class CounteredExpression {
     this._numbers = numbers;
   }
 
+  get numbers() {
+    return this._numbers;
+  }
 
+  get counterType() {
+    return this._counterType;
+  }
 }
 
 export class DayOfMonthExpression extends CounteredExpression {

@@ -82,19 +82,19 @@ function getSelectedExpressions() {
 
 function expr2apiPath(expr) {
   const API_PREFIX = "https://6xeipdrp36.execute-api.ap-northeast-1.amazonaws.com/Prod"
-  let number = expr._numbers[0];
+  let number = expr.numbers[0];
   let apiPath = null;
-  if (expr._counterType == CounteredExpression.CounterType.PLAIN_NUMBER) {
+  if (expr.counterType == CounteredExpression.CounterType.PLAIN_NUMBER) {
     apiPath = API_PREFIX + "/digit/" + number;
   }
-  if (expr._counterType == CounteredExpression.CounterType.DAY_OF_MONTH) {
+  if (expr.counterType == CounteredExpression.CounterType.DAY_OF_MONTH) {
     apiPath = API_PREFIX + "/day-of-month/" + number;
   }
-  if (expr._counterType == CounteredExpression.CounterType.DAY_OF_WEEK) {
+  if (expr.counterType == CounteredExpression.CounterType.DAY_OF_WEEK) {
     let char = DayOfWeekExpression.int2char(number);
     apiPath = API_PREFIX + "/day-of-week/" + char;
   }
-  if (expr._counterType == CounteredExpression.CounterType.MONTH_OF_YEAR) {
+  if (expr.counterType == CounteredExpression.CounterType.MONTH_OF_YEAR) {
     apiPath = API_PREFIX + "/month-of-year/" + number;
   }
   return apiPath;
@@ -114,7 +114,6 @@ var expr2audio = memoize(function(expr) {
 });
 
 class AudioPlayer {
-
   #prevAudio = null;
   #playbackRateGetter = function() {};
 
