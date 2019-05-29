@@ -7,12 +7,14 @@ export const CounterType = {
 };
 
 export class CounteredExpression {
+  _numbers = null;
+  _counters = [];
+  _counterType = null;
   constructor(numbers) {
-    this.numbers = numbers;
-    this.counters = [];
-    this.str = null
-    this.counterType = null;
+    this._numbers = numbers;
   }
+
+
 }
 
 export class DayOfMonthExpression extends CounteredExpression {
@@ -21,12 +23,12 @@ export class DayOfMonthExpression extends CounteredExpression {
       throw "IllegalArgumentException";
     }
     super([number]);
-    this.counters = ["日"];
-    this.counterType = CounterType.DAY_OF_MONTH;
+    this._counters = ["日"];
+    this._counterType = CounterType.DAY_OF_MONTH;
   }
 
   toString() {
-    return this.numbers[0] + this.counters[0];
+    return this._numbers[0] + this._counters[0];
   }
 }
 
@@ -36,12 +38,12 @@ export class MonthOfYearExpression extends CounteredExpression {
       throw "IllegalArgumentException";
     }
     super([number]);
-    this.counters = ["月"];
-    this.counterType = CounterType.MONTH_OF_YEAR;
+    this._counters = ["月"];
+    this._counterType = CounterType.MONTH_OF_YEAR;
   }
 
   toString() {
-    return this.numbers[0] + this.counters[0];
+    return this._numbers[0] + this._counters[0];
   }
 }
 
@@ -51,8 +53,8 @@ export class DayOfWeekExpression extends CounteredExpression {
       throw "IllegalArgumentException";
     }
     super([number]);
-    this.counters = ["曜日"];
-    this.counterType = CounterType.DAY_OF_WEEK;
+    this._counters = ["曜日"];
+    this._counterType = CounterType.DAY_OF_WEEK;
   }
 
   static int2char(i) {
@@ -69,18 +71,18 @@ export class DayOfWeekExpression extends CounteredExpression {
   }
 
   toString() {
-    return DayOfWeekExpression.int2char(this.numbers[0]) + this.counters[0];
+    return DayOfWeekExpression.int2char(this._numbers[0]) + this._counters[0];
   }
 }
 
 export class CounterlessExpression extends CounteredExpression {
   constructor(number) {
     super([number]);
-    this.counters = null;
-    this.counterType = CounterType.PLAIN_NUMBER;
+    this._counters = null;
+    this._counterType = CounterType.PLAIN_NUMBER;
   }
 
   toString() {
-    return this.numbers[0];
+    return this._numbers[0];
   }
 }

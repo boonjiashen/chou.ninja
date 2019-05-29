@@ -82,19 +82,19 @@ function getSelectedExpressions() {
 
 function expr2apiPath(expr) {
   const API_PREFIX = "https://6xeipdrp36.execute-api.ap-northeast-1.amazonaws.com/Prod"
-  let number = expr.numbers[0];
+  let number = expr._numbers[0];
   let apiPath = null;
-  if (expr.counterType == CounterType.PLAIN_NUMBER) {
+  if (expr._counterType == CounterType.PLAIN_NUMBER) {
     apiPath = API_PREFIX + "/digit/" + number;
   }
-  if (expr.counterType == CounterType.DAY_OF_MONTH) {
+  if (expr._counterType == CounterType.DAY_OF_MONTH) {
     apiPath = API_PREFIX + "/day-of-month/" + number;
   }
-  if (expr.counterType == CounterType.DAY_OF_WEEK) {
+  if (expr._counterType == CounterType.DAY_OF_WEEK) {
     let char = DayOfWeekExpression.int2char(number);
     apiPath = API_PREFIX + "/day-of-week/" + char;
   }
-  if (expr.counterType == CounterType.MONTH_OF_YEAR) {
+  if (expr._counterType == CounterType.MONTH_OF_YEAR) {
     apiPath = API_PREFIX + "/month-of-year/" + number;
   }
   return apiPath;
@@ -114,23 +114,40 @@ var expr2audio = memoize(function(expr) {
 });
 
 class AudioPlayer {
-  constructor() {
+
+  #prevAudio = null;
+  #playbackRateGetter = function() {};
+
+  constructor(playbackRateGetter) {
     const dummyAudio = $("<audio />")[0];
-    this._prevAudio = dummyAudio;
+    this.#prevAudio = dummyAudio;
+    this.#playbackRateGetter = playbackRateGetter;
   }
 
   play($audio) {
-    this._prevAudio.pause();
-    this._prevAudio.currentTime = 0;
+    this.#prevAudio.pause();
+    this.#prevAudio.currentTime = 0;
 
     const currAudio = $audio[0];
-    currAudio.playbackRate = getCurrentPlaybackRate();
+    currAudio.playbackRate = this.#playbackRateGetter();
     currAudio.play();
-    this._prevAudio = currAudio;
+    this.#prevAudio = currAudio;
   }
 }
 
-const audioPlayer = new AudioPlayer();
+const getCurrentPlaybackRate = (function() {
+  const playbackRateNominal2Float = {
+    "slow": 0.8,
+    "normal": 1,
+    "fast": 1.5
+  };
+  return function() {
+    const nominalPlaybackRate = $("input[name=\"playbackRate\"]:checked").val();
+    return playbackRateNominal2Float[nominalPlaybackRate];
+  };
+})();
+
+const audioPlayer = new AudioPlayer(getCurrentPlaybackRate);
 let trackGenerator = null;
 function initializeTrackGenerator() {
   let counteredExpressions = shuffle(getSelectedExpressions());
@@ -190,15 +207,3 @@ function appendToHistory(expr, $audio) {
   const historyRecord = getHistoryRecord(expr, $audio);
   $(".history > ul").prepend(historyRecord);
 }
-
-const getCurrentPlaybackRate = (function() {
-  const playbackRateNominal2Float = {
-    "slow": 0.8,
-    "normal": 1,
-    "fast": 1.5
-  };
-  return function() {
-    const nominalPlaybackRate = $("input[name=\"playbackRate\"]:checked").val();
-    return playbackRateNominal2Float[nominalPlaybackRate];
-  };
-})();

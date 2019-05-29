@@ -8,48 +8,59 @@ export class Generator {
 }
 
 export class GeneratorThatShufflesOnEmpty extends Generator {
+
+  #arr = [];
+  #remainders = [];
+
   constructor(arr) {
     super();
     if (arr.length == 0) {
       throw "IllegalArgumentException";
     }
-    this._arr = arr;
-    this._remainders = arr.slice(0);
+    this.#arr = arr;
+    this.#remainders = arr.slice(0);
   }
 
   next() {
-    if (this._remainders.length == 0) {
-      this._remainders = this._arr.slice(0);
-      this._remainders = shuffle(this._remainders);
+    if (this.#remainders.length == 0) {
+      this.#remainders = this.#arr.slice(0);
+      this.#remainders = shuffle(this.#remainders);
     }
-    const x = this._remainders.pop();
+    const x = this.#remainders.pop();
     return x;
   }
 }
 
 export class LookAheadGenerator extends Generator {
+
+  #preloadedGen = function() {};
+
   constructor(gen) {
     super();
-    this._preloadedGen = preload(function() {
+    this.#preloadedGen = preload(function() {
       return gen.next();
     })
   }
 
   next() {
-    return this._preloadedGen();
+    return this.#preloadedGen();
   }
 }
 
 export class TrackGenerator extends Generator {
+
+  #exprGenerator = function() {};
+  #expr2audio = function() {};
+
   constructor(exprGenerator, expr2audio) {
     super()
-    this._exprGenerator = exprGenerator;
-    this._expr2audio = expr2audio;
+    this.#exprGenerator = exprGenerator;
+    this.#expr2audio = expr2audio;
   }
 
   next() {
-    const expression = this._exprGenerator.next();
-    const $audio = this._expr2audio(expression);
+    const expression = this.#exprGenerator.next();
+    const $audio = this.#expr2audio(expression);
 
     return new Track(expression, $audio);
   }
