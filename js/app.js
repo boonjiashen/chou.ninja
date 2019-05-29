@@ -5,7 +5,7 @@ import {
 } from "./utils.mjs";
 import {
   CounterlessExpression,
-  CounterType,
+  CounteredExpression,
   MonthOfYearExpression,
   DayOfWeekExpression,
   DayOfMonthExpression
@@ -84,17 +84,17 @@ function expr2apiPath(expr) {
   const API_PREFIX = "https://6xeipdrp36.execute-api.ap-northeast-1.amazonaws.com/Prod"
   let number = expr._numbers[0];
   let apiPath = null;
-  if (expr._counterType == CounterType.PLAIN_NUMBER) {
+  if (expr._counterType == CounteredExpression.CounterType.PLAIN_NUMBER) {
     apiPath = API_PREFIX + "/digit/" + number;
   }
-  if (expr._counterType == CounterType.DAY_OF_MONTH) {
+  if (expr._counterType == CounteredExpression.CounterType.DAY_OF_MONTH) {
     apiPath = API_PREFIX + "/day-of-month/" + number;
   }
-  if (expr._counterType == CounterType.DAY_OF_WEEK) {
+  if (expr._counterType == CounteredExpression.CounterType.DAY_OF_WEEK) {
     let char = DayOfWeekExpression.int2char(number);
     apiPath = API_PREFIX + "/day-of-week/" + char;
   }
-  if (expr._counterType == CounterType.MONTH_OF_YEAR) {
+  if (expr._counterType == CounteredExpression.CounterType.MONTH_OF_YEAR) {
     apiPath = API_PREFIX + "/month-of-year/" + number;
   }
   return apiPath;

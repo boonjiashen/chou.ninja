@@ -1,15 +1,16 @@
-// See: https://stackoverflow.com/a/2383215/3606378
-export const CounterType = {
-  "DAY_OF_MONTH": {"string": "day-of-month", "value": 1},
-  "DAY_OF_WEEK": {"string": "day-of-week", "value": 2},
-  "PLAIN_NUMBER": {"string": "plain-number", "value": 3},
-  "MONTH_OF_YEAR": {"string": "month-of-year", "value": 4}
-};
-
 export class CounteredExpression {
   _numbers = null;
   _counters = [];
   _counterType = null;
+
+  // See: https://stackoverflow.com/a/2383215/3606378
+  static CounterType = {
+    "DAY_OF_MONTH": {"string": "day-of-month", "value": 1},
+    "DAY_OF_WEEK": {"string": "day-of-week", "value": 2},
+    "PLAIN_NUMBER": {"string": "plain-number", "value": 3},
+    "MONTH_OF_YEAR": {"string": "month-of-year", "value": 4}
+  };
+
   constructor(numbers) {
     this._numbers = numbers;
   }
@@ -24,7 +25,7 @@ export class DayOfMonthExpression extends CounteredExpression {
     }
     super([number]);
     this._counters = ["日"];
-    this._counterType = CounterType.DAY_OF_MONTH;
+    this._counterType = CounteredExpression.CounterType.DAY_OF_MONTH;
   }
 
   toString() {
@@ -39,7 +40,7 @@ export class MonthOfYearExpression extends CounteredExpression {
     }
     super([number]);
     this._counters = ["月"];
-    this._counterType = CounterType.MONTH_OF_YEAR;
+    this._counterType = CounteredExpression.CounterType.MONTH_OF_YEAR;
   }
 
   toString() {
@@ -54,7 +55,7 @@ export class DayOfWeekExpression extends CounteredExpression {
     }
     super([number]);
     this._counters = ["曜日"];
-    this._counterType = CounterType.DAY_OF_WEEK;
+    this._counterType = CounteredExpression.CounterType.DAY_OF_WEEK;
   }
 
   static int2char(i) {
@@ -79,7 +80,7 @@ export class CounterlessExpression extends CounteredExpression {
   constructor(number) {
     super([number]);
     this._counters = null;
-    this._counterType = CounterType.PLAIN_NUMBER;
+    this._counterType = CounteredExpression.CounterType.PLAIN_NUMBER;
   }
 
   toString() {
