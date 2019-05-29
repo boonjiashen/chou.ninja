@@ -3,6 +3,8 @@
 ## Features
 * Make playback rate part of history (should we?)
 * Make series never repeat a word
+* Uniformly distribute content type play rates
+* Scale number range to arbitrarily large numbers by not instantiating entire number range
 * Add option to have only 1-10 days of the month
 
 ## Bugs
@@ -12,6 +14,3 @@
 
 ## Cost savings
 * Restrict APIG to only this website
-
-## Operations
-* Add traffic tracker
