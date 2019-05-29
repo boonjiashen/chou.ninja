@@ -11,12 +11,12 @@ import {
   LookAheadGenerator,
   TrackGenerator
 } from "./Generator.mjs";
-import {AudioPlayer} from "./AudioPlayer.mjs";
 import {
   selectedExpressionsSupplier,
   NONE
 } from "./expressionsSupplier.mjs";
-import {Supplier} from "./Supplier.mjs";
+import {AudioPlayer} from "./AudioPlayer.mjs";
+import {playbackRateSupplier} from "./playbackRateSupplier.mjs";
 
 $(window).on('load', function() {
   main();
@@ -64,20 +64,6 @@ var expr2audio = memoize(function(expr) {
   return audio;
 });
 
-class PlaybackRateSupplier extends Supplier {
-  static #playbackRateNominal2Float = {
-    "slow": 0.8,
-    "normal": 1,
-    "fast": 1.5
-  };
-
-  get() {
-    const nominalPlaybackRate = $("input[name=\"playbackRate\"]:checked").val();
-    return PlaybackRateSupplier.#playbackRateNominal2Float[nominalPlaybackRate];
-  }
-}
-
-const playbackRateSupplier = new PlaybackRateSupplier();
 const audioPlayer = new AudioPlayer(() => playbackRateSupplier.get());
 let trackGenerator = null;
 
