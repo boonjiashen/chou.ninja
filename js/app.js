@@ -16,6 +16,7 @@ import {
   selectedExpressionsSupplier,
   NONE
 } from "./expressionsSupplier.mjs";
+import {Supplier} from "./Supplier.mjs";
 
 $(window).on('load', function() {
   main();
@@ -63,24 +64,26 @@ var expr2audio = memoize(function(expr) {
   return audio;
 });
 
-const getCurrentPlaybackRate = (function() {
-  const playbackRateNominal2Float = {
+class PlaybackRateSupplier extends Supplier {
+  static #playbackRateNominal2Float = {
     "slow": 0.8,
     "normal": 1,
     "fast": 1.5
   };
-  return function() {
-    const nominalPlaybackRate = $("input[name=\"playbackRate\"]:checked").val();
-    return playbackRateNominal2Float[nominalPlaybackRate];
-  };
-})();
 
-const audioPlayer = new AudioPlayer(getCurrentPlaybackRate);
+  get() {
+    const nominalPlaybackRate = $("input[name=\"playbackRate\"]:checked").val();
+    return PlaybackRateSupplier.#playbackRateNominal2Float[nominalPlaybackRate];
+  }
+}
+
+const playbackRateSupplier = new PlaybackRateSupplier();
+const audioPlayer = new AudioPlayer(() => playbackRateSupplier.get());
 let trackGenerator = null;
 function initializeTrackGenerator() {
   let counteredExpressions = shuffle(getSelectedExpressions());
   let expressionGenerator = new GeneratorThatShufflesOnEmpty(counteredExpressions);
-  let trackGeneratorWithoutLookAhead = new TrackGenerator(expressionGenerator, expr2audio)
+  let trackGeneratorWithoutLookAhead = new TrackGenerator(expressionGenerator, expr2audio);
   trackGenerator = new LookAheadGenerator(trackGeneratorWithoutLookAhead);
 }
 
