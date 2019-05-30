@@ -1,5 +1,4 @@
 import {
-  shuffle,
   memoize
 } from "./utils.mjs";
 import {
@@ -7,16 +6,12 @@ import {
   DayOfWeekExpression
 } from "./CounteredExpression.mjs";
 import {
-  GeneratorThatShufflesOnEmpty,
-  LookAheadGenerator,
-  TrackGenerator
-} from "./Generator.mjs";
-import {
   selectedExpressionsSupplier,
   NONE
 } from "./expressionsSupplier.mjs";
 import {AudioPlayer} from "./AudioPlayer.mjs";
 import {playbackRateSupplier} from "./playbackRateSupplier.mjs";
+import {cooccurrenceTracks, lookahead, shuffleOnEmpty} from "./Generator.mjs";
 
 $(window).on('load', function() {
   main();
@@ -68,17 +63,18 @@ const audioPlayer = new AudioPlayer(() => playbackRateSupplier.get());
 let trackGenerator = null;
 
 function getTrackGenerator() {
-  let counteredExpressions = shuffle(getSelectedExpressions());
-  let expressionGenerator = new GeneratorThatShufflesOnEmpty(counteredExpressions);
-  let trackGeneratorWithoutLookAhead = new TrackGenerator(expressionGenerator, expr2audio);
-  return new LookAheadGenerator(trackGeneratorWithoutLookAhead);
+  const counteredExpressions = getSelectedExpressions();
+  const expressionGenerator = shuffleOnEmpty(counteredExpressions);
+  const trackGeneratorWithoutLookAhead = cooccurrenceTracks(expressionGenerator, expr2audio);
+
+  return lookahead(trackGeneratorWithoutLookAhead);
 }
 
 function main() {
   trackGenerator = getTrackGenerator();
   $(".buttons > button")
     .mousedown(function() {
-      const track = trackGenerator.next();
+      const track = trackGenerator.next().value;
       const expr = track.counteredExpression;
       const $audio = track.$audio;
       audioPlayer.play($audio);
